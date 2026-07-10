@@ -1030,3 +1030,60 @@ body {
     height: 400px;
   }
 }
+
+/* ── 카카오 장소 자동완성 드롭다운 ── */
+.autocomplete-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(44, 38, 35, 0.12);
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0;
+  z-index: 99999;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid #f5f0ea;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background-color: var(--color-brand-muted);
+}
+
+.autocomplete-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+}
+
+.autocomplete-addr {
+  font-size: 0.75rem;
+  color: var(--color-olive);
+}
+
+.autocomplete-cat {
+  font-size: 0.7rem;
+  color: #bbb;
+}
+
+/* select-three 3열 폼 */
+.select-three {
+  grid-template-columns: 1fr 1fr 1fr !important;
+}
