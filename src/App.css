@@ -754,6 +754,12 @@ body {
   color: var(--color-charcoal);
   outline: none;
   transition: border-color 0.2s;
+  height: 44px; /* input과 select의 세로 크기를 완벽하게 일치시킴 */
+}
+
+/* textarea는 높이가 늘어날 수 있도록 예외 처리 */
+.form-group textarea {
+  height: auto;
 }
 
 .form-group input:focus,

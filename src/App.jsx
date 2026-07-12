@@ -539,9 +539,9 @@ function App() {
 
             <form onSubmit={saveNewRecommendation}>
               {/* 식당명 + 자동완성 */}
-              <div className="form-group row-fields">
-                <div style={{ position: 'relative' }} ref={suggestionsRef}>
-                  <label>식당 명칭 (필수) — 입력 시 자동완성</label>
+              <div className="row-fields">
+                <div className="form-group" style={{ position: 'relative' }} ref={suggestionsRef}>
+                  <label>식당 명칭 (자동완성 추천)</label>
                   <input
                     type="text"
                     placeholder="예: 스타벅스 홍대점, 영진돼지국밥"
@@ -567,7 +567,7 @@ function App() {
                     </ul>
                   )}
                 </div>
-                <div>
+                <div className="form-group">
                   <label>추천 작성자</label>
                   <select value={newRest.member} onChange={(e) => setNewRest({ ...newRest, member: e.target.value })}>
                     <option value="papa">아빠 👨‍💼</option>
@@ -580,8 +580,8 @@ function App() {
               </div>
 
               {/* 지역 / 카테고리 / 별점 - 자동완성 선택 시 자동입력됨 */}
-              <div className="form-group row-fields select-three">
-                <div>
+              <div className="row-fields select-three">
+                <div className="form-group">
                   <label>도시 구역 (자동매핑)</label>
                   <select value={newRest.region} onChange={(e) => setNewRest({ ...newRest, region: e.target.value })}>
                     <option value="서울">서울 🗼</option>
@@ -590,7 +590,7 @@ function App() {
                     <option value="강원">강원 🏔️</option>
                   </select>
                 </div>
-                <div>
+                <div className="form-group">
                   <label>메뉴 종류 (자동매핑)</label>
                   <select value={newRest.category} onChange={(e) => setNewRest({ ...newRest, category: e.target.value })}>
                     <option value="korean">든든 한식 🍚</option>
@@ -599,7 +599,7 @@ function App() {
                     <option value="cafe">카페/디저트 ☕</option>
                   </select>
                 </div>
-                <div>
+                <div className="form-group">
                   <label>내 추천 별점</label>
                   <select value={newRest.rating} onChange={(e) => setNewRest({ ...newRest, rating: e.target.value })}>
                     <option value={5}>⭐⭐⭐⭐⭐ (강력 추천)</option>
