@@ -436,6 +436,7 @@ body {
   flex-grow: 1;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3; /* 표준 속성 적용 (린트 해결) */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -740,6 +741,7 @@ body {
   font-weight: 700;
   color: var(--color-olive);
   margin-bottom: 0.4rem;
+  white-space: nowrap; /* 모바일 반응형 시 창 크기가 좁아져도 강제 개행 방지 */
 }
 
 .form-group input,

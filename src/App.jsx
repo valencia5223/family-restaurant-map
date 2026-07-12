@@ -582,7 +582,7 @@ function App() {
               {/* 지역 / 카테고리 / 별점 - 자동완성 선택 시 자동입력됨 */}
               <div className="row-fields select-three">
                 <div className="form-group">
-                  <label>도시 구역 (자동매핑)</label>
+                  <label>도시 구역 (자동)</label>
                   <select value={newRest.region} onChange={(e) => setNewRest({ ...newRest, region: e.target.value })}>
                     <option value="서울">서울 🗼</option>
                     <option value="경기">경기 🌳</option>
@@ -591,7 +591,7 @@ function App() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>메뉴 종류 (자동매핑)</label>
+                  <label>음식 종류 (자동)</label>
                   <select value={newRest.category} onChange={(e) => setNewRest({ ...newRest, category: e.target.value })}>
                     <option value="korean">든든 한식 🍚</option>
                     <option value="western">근사 양식 🍝</option>
