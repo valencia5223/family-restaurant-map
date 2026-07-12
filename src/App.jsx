@@ -572,8 +572,9 @@ function App() {
                   <select value={newRest.member} onChange={(e) => setNewRest({ ...newRest, member: e.target.value })}>
                     <option value="papa">아빠 👨‍💼</option>
                     <option value="mama">엄마 👩‍🍳</option>
+                    <option value="daughter">큰딸 🙋‍♀️</option>
+                    <option value="makdung">작은딸 👧</option>
                     <option value="husband">사위 🙋‍♂️</option>
-                    <option value="daughter">딸 🙋‍♀️</option>
                   </select>
                 </div>
               </div>

@@ -2,8 +2,9 @@ export const members = {
   all: { avatar: '👪', name: '가족 전체', role: '우리 가족' },
   papa: { avatar: '👨‍💼', name: '아빠', role: '부모님' },
   mama: { avatar: '👩‍🍳', name: '엄마', role: '부모님' },
-  husband: { avatar: '🙋‍♂️', name: '사위', role: '유서방' },
-  daughter: { avatar: '🙋‍♀️', name: '딸', role: '우리딸' }
+  daughter: { avatar: '🙋‍♀️', name: '큰딸', role: '랑구' },
+  makdung: { avatar: '👧', name: '작은딸', role: '막둥이' },
+  husband: { avatar: '🙋‍♂️', name: '사위', role: '차서방' }
 };
 
 export const regions = [
