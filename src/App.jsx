@@ -489,7 +489,7 @@ function App() {
       <div className="header-profile-section">
         <div className="header-profile-badge">
           <span className="header-profile-emoji">{memberProfiles[activeProfile]?.emoji}</span>
-          <span>{memberProfiles[activeProfile]?.name} 헌터</span>
+          <span>{memberProfiles[activeProfile]?.name}</span>
           <button className="header-profile-btn" onClick={() => handleProfileChange(null)}>
             전환
           </button>

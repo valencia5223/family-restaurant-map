@@ -1203,28 +1203,27 @@ body {
   position: absolute;
   top: 1.25rem;
   right: 1.25rem;
-  z-index: 1000;
+  z-index: 999999 !important; /* 원래 헤더 뒤에 가려져 있던 레이어 높이를 최고로 올림 */
 }
 
 .header-profile-badge {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid var(--color-border);
+  background: #ffffff !important; /* 투명도를 없애고 확실한 흰색 배경 고정 */
+  border: 1.5px solid var(--color-border);
   padding: 0.45rem 1rem;
   border-radius: 30px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--color-charcoal);
-  box-shadow: var(--shadow-md);
+  color: var(--color-charcoal) !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12); /* 그림자 톤 입체화 */
   transition: all 0.2s ease;
-  backdrop-filter: blur(4px);
 }
 
 .header-profile-badge:hover {
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(44, 38, 35, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
 .header-profile-emoji {
@@ -1232,26 +1231,30 @@ body {
 }
 
 .header-profile-btn {
-  background: var(--color-rust);
-  color: #ffffff;
+  background: var(--color-rust) !important; /* 색상이 반투명 속에 가리던 현상 차단 */
+  color: #ffffff !important;
   border: none;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.25rem 0.6rem;
   border-radius: 20px;
   cursor: pointer;
+  opacity: 1 !important; /* 마우스 호버 전에도 선명하게 100% 노출 강제 */
+  visibility: visible !important;
+  display: inline-block !important;
   transition: background 0.2s ease, transform 0.1s ease;
   box-shadow: 0 2px 5px rgba(224, 86, 36, 0.3);
 }
 
 .header-profile-btn:hover {
-  background: #C45037;
+  background: #C45037 !important;
   transform: translateY(-1px);
 }
 
 .header-profile-btn:active {
   transform: translateY(0);
 }
+
 
 /* 애니메이션 */
 @keyframes fadeInDown {
