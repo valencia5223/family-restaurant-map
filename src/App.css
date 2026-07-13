@@ -1314,6 +1314,7 @@ body {
 
 /* 모바일 반응형 조절 */
 @media (max-width: 600px) {
+  /* 🎭 로그인 화면 비율/배율 조작 */
   .profile-select-title {
     font-size: 1.35rem; /* 갤럭시, 아이폰 비율에 어울리도록 컴팩트하게 축소 */
     margin-bottom: 1.8rem;
@@ -1343,6 +1344,79 @@ body {
     margin-top: 0.4rem;
     font-weight: 550;
   }
+  
+  /* 🖥️ 메인화면 스마트폰 배율 최적화 */
+  .bistro-app {
+    padding: 0.8rem 0.6rem !important; /* 스마트폰 좌우 여백을 넓혀 콘텐츠에 집중하도록 조정 */
+  }
+  .bistro-header h1 {
+    font-size: 1.45rem !important;
+  }
+  .bistro-header p {
+    font-size: 0.76rem !important;
+  }
+  .stats-dashboard {
+    padding: 0.6rem !important;
+    gap: 0.4rem !important;
+    margin-bottom: 1.2rem !important;
+  }
+  .stat-card {
+    padding: 0.4rem 0 !important;
+  }
+  .stat-num {
+    font-size: 1.05rem !important;
+  }
+  .stat-label {
+    font-size: 0.68rem !important;
+  }
+  .search-filter-section {
+    gap: 0.6rem !important;
+    margin-bottom: 1.2rem !important;
+  }
+  .filter-group label {
+    font-size: 0.72rem !important;
+  }
+  .bistro-grid {
+    gap: 1rem !important;
+  }
+  .bistro-card {
+    padding: 1rem !important;
+    border-radius: 14px !important;
+  }
+  .recommender-badge {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.72rem !important;
+    margin-bottom: 0.6rem !important;
+  }
+  
+  /* ✍️ 신규창 및 🚗 푸쉬창(음식점 상세창) 모빌리티 전면 마이그레이션 */
+  .modal-content {
+    padding: 1.2rem 1rem !important; /* 모달 내부 불필요한 공백을 대량 절감하여 화면 효율 증가 */
+    border-radius: 16px !important;
+    width: 92% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+  .modal-content h2 {
+    font-size: 1.2rem !important;
+    margin-bottom: 0.8rem !important;
+  }
+  .modal-body .detail-row {
+    margin-bottom: 0.8rem !important;
+  }
+  .detail-label {
+    font-size: 0.72rem !important;
+  }
+  .detailed-address,
+  .detailed-review {
+    font-size: 0.85rem !important;
+  }
+  .nav-btn {
+    padding: 6px 10px !important; /* 작은 모바일 화면에서도 3개의 길안내 버튼이 온전히 표출되도록 축소 */
+    font-size: 0.78rem !important;
+    border-radius: 6px !important;
+  }
+
   .header-profile-section {
     position: static;
     margin-top: 0.5rem;
