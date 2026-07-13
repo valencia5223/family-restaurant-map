@@ -725,10 +725,9 @@ function App() {
                 <div className="form-group">
                   <label>도시 구역 (자동)</label>
                   <select value={newRest.region} onChange={(e) => setNewRest({ ...newRest, region: e.target.value })}>
-                    <option value="서울">서울 🗼</option>
-                    <option value="경기">경기 🌳</option>
-                    <option value="부산">부산 🌊</option>
-                    <option value="강원">강원 🏔️</option>
+                    {regions.filter(r => r.id !== 'all').map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="form-group">
