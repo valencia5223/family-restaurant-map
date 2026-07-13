@@ -1059,7 +1059,8 @@ body {
     font-size: 0.65rem;
   }
 
-  .row-fields {
+  .row-fields,
+  .row-fields.select-three {
     grid-template-columns: 1fr !important;
     gap: 0.8rem;
   }
