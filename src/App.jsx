@@ -34,9 +34,11 @@ function mapKakaoCategory(categoryGroupCode, categoryName) {
   if (categoryGroupCode === 'CE7') return 'cafe'; // 카페
   if (categoryGroupCode === 'FD6') {
     const name = categoryName || '';
-    if (name.includes('일식') || name.includes('중식') || name.includes('동남아') || name.includes('아시안')) return 'asian';
-    if (name.includes('양식') || name.includes('이탈리안') || name.includes('프렌치') || name.includes('멕시칸')) return 'western';
-    if (name.includes('카페') || name.includes('디저트')) return 'cafe';
+    if (name.includes('일식') || name.includes('초밥') || name.includes('돈까스')) return 'japanese';
+    if (name.includes('중식') || name.includes('짜장') || name.includes('중화요리')) return 'chinese';
+    if (name.includes('동남아') || name.includes('아시안') || name.includes('태국') || name.includes('베트남') || name.includes('인도')) return 'asian';
+    if (name.includes('양식') || name.includes('이탈리안') || name.includes('프렌치') || name.includes('피자') || name.includes('파스타') || name.includes('스테이크')) return 'western';
+    if (name.includes('카페') || name.includes('디저트') || name.includes('제과') || name.includes('빵')) return 'cafe';
     return 'korean';
   }
   return 'korean';
@@ -733,10 +735,9 @@ function App() {
                 <div className="form-group">
                   <label>음식 종류 (자동)</label>
                   <select value={newRest.category} onChange={(e) => setNewRest({ ...newRest, category: e.target.value })}>
-                    <option value="korean">든든 한식 🍚</option>
-                    <option value="western">근사 양식 🍝</option>
-                    <option value="asian">일/중식/아시안 🍣</option>
-                    <option value="cafe">카페/디저트 ☕</option>
+                    {foodCategories.filter(c => c.id !== 'all').map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="form-group">

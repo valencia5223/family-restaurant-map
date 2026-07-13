@@ -22,9 +22,11 @@ export const regions = [
 
 export const foodCategories = [
   { id: 'all', name: '모든 요리' },
-  { id: 'korean', name: '든든 한식 🍚' },
-  { id: 'western', name: '근사 양식 🍝' },
-  { id: 'asian', name: '일식/중식/아시안 🍣' },
+  { id: 'korean', name: '한식 🍚' },
+  { id: 'western', name: '양식 🍝' },
+  { id: 'japanese', name: '일식 🍣' },
+  { id: 'chinese', name: '중식 🥟' },
+  { id: 'asian', name: '아시안 🍜' },
   { id: 'cafe', name: '카페/디저트 ☕' }
 ];
 
