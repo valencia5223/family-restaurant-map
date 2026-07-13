@@ -2,8 +2,8 @@ export const members = {
   all: { avatar: '/avatars/avatar_all.png', name: '가족 전체', role: '우리 가족' },
   papa: { avatar: '/avatars/avatar_papa.png', name: '할비', role: '할아버지' },
   mama: { avatar: '/avatars/avatar_mama.png', name: '할미', role: '할머니' },
-  daughter: { avatar: '/avatars/avatar_daughter.png', name: '엄마', role: '큰딸' },
-  makdung: { avatar: '/avatars/avatar_makdung.png', name: '이모', role: '작은딸' },
+  daughter: { avatar: '/avatars/avatar_daughter.png', name: '이모', role: '큰딸' },
+  makdung: { avatar: '/avatars/avatar_makdung.png', name: '엄마', role: '작은딸' },
   husband: { avatar: '/avatars/avatar_husband.png', name: '아빠', role: '사위' },
   yuna: { avatar: '/avatars/avatar_yuna.png', name: '차유나', role: '손주' }
 };

@@ -7,8 +7,8 @@ import './App.css';
 const memberProfiles = {
   papa: { name: '할비', avatar: '/avatars/avatar_papa.png' },
   mama: { name: '할미', avatar: '/avatars/avatar_mama.png' },
-  daughter: { name: '엄마', avatar: '/avatars/avatar_daughter.png' },
-  makdung: { name: '이모', avatar: '/avatars/avatar_makdung.png' },
+  daughter: { name: '이모', avatar: '/avatars/avatar_daughter.png' },
+  makdung: { name: '엄마', avatar: '/avatars/avatar_makdung.png' },
   husband: { name: '아빠', avatar: '/avatars/avatar_husband.png' },
   yuna: { name: '차유나(손주)', avatar: '/avatars/avatar_yuna.png' }
 };
