@@ -419,26 +419,36 @@ function App() {
   // 5. 메인 카카오맵 렌더링
   // ──────────────────────────────────────────────────
   useEffect(() => {
-    // 기존 인스턴스 정리
-    if (mainMapRef.current) {
-      mainMapRef.current = null;
+    if (viewMode !== 'map') {
+      if (mainMapRef.current) {
+        mainMapRef.current = null;
+      }
+      // 리셋 시 이전 현위치 마커 제거
+      if (window.myLocationMarker) {
+        window.myLocationMarker.setMap(null);
+        window.myLocationMarker = null;
+      }
+      return;
     }
-    // 지도 리셋 시 이전 현위치 마커 제거
-    if (window.myLocationMarker) {
-      window.myLocationMarker.setMap(null);
-      window.myLocationMarker = null;
-    }
-    if (viewMode !== 'map') return;
-    if (!window.kakao || !window.kakao.maps) return;
+    if (!kakaoLoaded || !window.kakao || !window.kakao.maps) return;
 
     const container = document.getElementById('family-map');
     if (!container) return;
 
-    const options = { center: new window.kakao.maps.LatLng(36.3, 127.8), level: 13 };
-    const map = new window.kakao.maps.Map(container, options);
-    mainMapRef.current = map;
+    let map = mainMapRef.current;
+    if (!map) {
+      const options = { center: new window.kakao.maps.LatLng(36.3, 127.8), level: 13 };
+      map = new window.kakao.maps.Map(container, options);
+      mainMapRef.current = map;
+    }
+
+    // 1) 기존 모든 오버레이/마커 제거
+    if (mainMarkersRef.current) {
+      mainMarkersRef.current.forEach(m => m.setMap(null));
+    }
     mainMarkersRef.current = [];
 
+    // 2) 신규 마커 렌더링
     filteredRestaurants.forEach(rest => {
       if (!rest.coords || rest.coords.length !== 2) return;
       const [lat, lng] = rest.coords;
@@ -446,7 +456,6 @@ function App() {
 
       const markerPosition = new window.kakao.maps.LatLng(lat, lng);
       
-      // 🎨 추천인의 개별 이미지 아바타 기반 커스텀 마커(CustomOverlay) 생성
       const overlayContent = document.createElement('div');
       overlayContent.className = 'custom-avatar-marker';
       overlayContent.innerHTML = `<img src="${memInfo.avatar}" alt="${memInfo.name}" />`;
@@ -490,7 +499,7 @@ function App() {
       map.setCenter(new window.kakao.maps.LatLng(lat, lng));
       map.setLevel(4);
     }
-  }, [viewMode, filteredRestaurants]);
+  }, [viewMode, kakaoLoaded, filteredRestaurants]);
 
   // ──────────────────────────────────────────────────
   // 6. 등록 모달 미니 카카오맵 렌더링
