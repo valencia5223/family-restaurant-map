@@ -840,9 +840,37 @@ function App() {
           <div className="list-header-section">
             <h3 className="list-title">🍽️ 가족 추천 맛집 목록 <span className="total-count">({filteredRestaurants.length}곳)</span></h3>
             <div className="list-sort-select">
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-dropdown-inline">
+              <select 
+                value={sortBy} 
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === 'distance') {
+                    if (!navigator.geolocation) {
+                      alert('이 기기는 위치 정보(GPS) 조회를 지원하지 않습니다.');
+                      return;
+                    }
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => {
+                        setUserLocation({
+                          lat: pos.coords.latitude,
+                          lng: pos.coords.longitude
+                        });
+                        setSortBy('distance');
+                      },
+                      (err) => {
+                        console.error('위치 권한 에러:', err);
+                        alert('위치 정보를 가져올 수 없습니다. 브라우저의 위치 조회 권한을 확인해주세요.');
+                      }
+                    );
+                  } else {
+                    setSortBy(val);
+                  }
+                }} 
+                className="sort-dropdown-inline"
+              >
                 <option value="recent">최근 등록순 📅</option>
                 <option value="rating">별점 높은순 ⭐</option>
+                <option value="distance">거리 가까운순 🚗</option>
               </select>
             </div>
           </div>
