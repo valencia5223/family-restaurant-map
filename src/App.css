@@ -1315,23 +1315,33 @@ body {
 /* 모바일 반응형 조절 */
 @media (max-width: 600px) {
   .profile-select-title {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
+    font-size: 1.35rem; /* 갤럭시, 아이폰 비율에 어울리도록 컴팩트하게 축소 */
+    margin-bottom: 1.8rem;
+    font-weight: 700;
+    line-height: 1.4;
+    padding: 0 1rem;
   }
   .profile-cards-container {
-    gap: 1.2rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 태블릿 느낌을 걷어내고 모바일 전용 3열 격자로 배치 */
+    gap: 1.5rem 0.8rem;
+    max-width: 290px; /* 아이폰 SE 같은 좁은 화면에서도 옆으로 퍼지지 않게 중앙 집중계 고정 */
+    margin: 0 auto 2rem auto;
   }
   .profile-avatar-wrapper {
-    width: 80px;
-    height: 80px;
-    font-size: 2.5rem;
+    width: 72px; /* 모바일 한 손 터치 및 가시성에 예쁜 미니어처 72px 규격 */
+    height: 72px;
+    border-radius: 8px;
   }
   .profile-card {
-    width: 90px;
+    width: 100%;
+    max-width: 80px;
+    margin: 0 auto;
   }
   .profile-name {
-    font-size: 0.85rem;
-    margin-top: 0.6rem;
+    font-size: 0.78rem; /* 세밀화된 모바일 전용 글꼴 */
+    margin-top: 0.4rem;
+    font-weight: 550;
   }
   .header-profile-section {
     position: static;
