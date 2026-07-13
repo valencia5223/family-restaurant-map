@@ -441,7 +441,6 @@ function App() {
   const saveNewRecommendation = async (e) => {
     e.preventDefault();
     if (!newRest.name.trim()) return alert('식당 이름을 적어주세요.');
-    if (!newRest.review.trim()) return alert('식당 후기를 적어주세요.');
 
     const cleanTags = newRest.tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
 
@@ -514,7 +513,6 @@ function App() {
   const updateRecommendation = async (e) => {
     e.preventDefault();
     if (!editingRest.name.trim()) return alert('식당 이름을 적어주세요.');
-    if (!editingRest.review.trim()) return alert('식당 후기를 적어주세요.');
 
     const cleanTags = editingRest.tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
 
@@ -999,17 +997,17 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label>이 식당의 꼭 먹어야 마땅할 요리</label>
+                <label>추천메뉴</label>
                 <input type="text" placeholder="예: 수육백반, 순대국밥" value={newRest.recomMenu} onChange={(e) => setNewRest({ ...newRest, recomMenu: e.target.value })} />
               </div>
 
               <div className="form-group">
-                <label>조언 섞인 한줄평 (필수)</label>
-                <textarea placeholder="추천 이유, 팁, 주차 정보 등을 자유롭게 작성하세요." rows={3} value={newRest.review} onChange={(e) => setNewRest({ ...newRest, review: e.target.value })} required />
+                <label>한줄평</label>
+                <textarea placeholder="추천 이유, 팁, 주차 정보 등을 자유롭게 작성하세요." rows={3} value={newRest.review} onChange={(e) => setNewRest({ ...newRest, review: e.target.value })} />
               </div>
 
               <div className="form-group">
-                <label>추천 성향 키워드 (쉼표로 구분)</label>
+                <label>비고</label>
                 <input type="text" placeholder="예: 주차편리, 웨이팅숨참, 노포맛집, 오션뷰" value={newRest.tagsInput} onChange={(e) => setNewRest({ ...newRest, tagsInput: e.target.value })} />
               </div>
 
@@ -1154,17 +1152,17 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label>이 식당의 꼭 먹어야 마땅할 요리</label>
+                <label>추천메뉴</label>
                 <input type="text" placeholder="예: 수육백반, 순대국밥" value={editingRest.recomMenu} onChange={(e) => setEditingRest({ ...editingRest, recomMenu: e.target.value })} />
               </div>
 
               <div className="form-group">
-                <label>조언 섞인 한줄평 (필수)</label>
-                <textarea placeholder="추천 이유, 팁, 주차 정보 등을 자유롭게 작성하세요." rows={3} value={editingRest.review} onChange={(e) => setEditingRest({ ...editingRest, review: e.target.value })} required />
+                <label>한줄평</label>
+                <textarea placeholder="추천 이유, 팁, 주차 정보 등을 자유롭게 작성하세요." rows={3} value={editingRest.review} onChange={(e) => setEditingRest({ ...editingRest, review: e.target.value })} />
               </div>
 
               <div className="form-group">
-                <label>추천 성향 키워드 (쉼표로 구분)</label>
+                <label>비고</label>
                 <input type="text" placeholder="예: 주차편리, 웨이팅숨참, 노포맛집, 오션뷰" value={editingRest.tagsInput} onChange={(e) => setEditingRest({ ...editingRest, tagsInput: e.target.value })} />
               </div>
 
