@@ -110,7 +110,7 @@ function App() {
         const { data, error } = await supabase
           .from('restaurants')
           .select('*')
-          .order('id', { ascending: true }); // ID 기준 정렬
+          .order('id', { ascending: false }); // 최신 ID가 먼저 나오게 정렬(최근 등록순 우선)
         
         if (error) throw error;
         
@@ -148,6 +148,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedRating, setSelectedRating] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'rating'
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
   // 뷰 모드 토글: 'list' vs 'map'
@@ -204,7 +205,7 @@ function App() {
   // 3. 검색 & 다중 필터링
   // ──────────────────────────────────────────────────
   const filteredRestaurants = useMemo(() => {
-    return restaurants.filter(r => {
+    const filtered = restaurants.filter(r => {
       const matchMember = selectedMember === 'all' || r.member === selectedMember;
       const matchRegion = selectedRegion === 'all' || r.region === selectedRegion;
       const matchCategory = selectedCategory === 'all' || r.category === selectedCategory;
@@ -227,7 +228,16 @@ function App() {
         r.tags.some(t => t.toLowerCase().includes(text));
       return matchMember && matchRegion && matchCategory && matchRating && matchSearch;
     });
-  }, [restaurants, selectedMember, selectedRegion, selectedCategory, selectedRating, searchTerm]);
+
+    // 최근등록순(최근 등록일/시간)과 별점높은순 정렬 옵션 지원
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'rating') {
+        const ratingDiff = parseFloat(b.rating) - parseFloat(a.rating);
+        if (ratingDiff !== 0) return ratingDiff;
+      }
+      return b.id - a.id;
+    });
+  }, [restaurants, selectedMember, selectedRegion, selectedCategory, selectedRating, searchTerm, sortBy]);
 
   // ──────────────────────────────────────────────────
   // 4-A. 카카오 장소 검색 자동완성 (디바운스 300ms)
@@ -482,7 +492,7 @@ function App() {
         coords: dbObj.coords
       };
 
-      setRestaurants(prev => [...prev, clientObj]);
+      setRestaurants(prev => [clientObj, ...prev]);
       setIsAddingNew(false);
       setNewRest({ name: '', member: 'papa', region: '서울', category: 'korean', rating: 5.0, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: '' });
       setFormLat(37.5665);
@@ -645,7 +655,7 @@ function App() {
       <section className="stats-dashboard">
         <div className="stat-card"><span className="stat-num">{stats.total}개</span><span className="stat-label">보관 맛집 수</span></div>
         <div className="stat-card">
-          <span className="stat-num" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <span className="stat-num" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%' }}>
             {stats.topMemberInfo ? (
               <>
                 <img src={stats.topMemberInfo.avatar} className="avatar-mini-inline" alt="" />
@@ -653,7 +663,7 @@ function App() {
               </>
             ) : '-'}
           </span>
-          <span className="stat-label">최다 맛집 헌터</span>
+          <span className="stat-label">최다 맛집 추천인</span>
         </div>
         <div className="stat-card"><span className="stat-num">{stats.topFood}</span><span className="stat-label">가족 선호 음식 1위</span></div>
         <div className="stat-card"><span className="stat-num">⭐ {stats.avgRating}</span><span className="stat-label">가족 평균 리뷰 별점</span></div>
@@ -698,6 +708,13 @@ function App() {
               <option value="1.5">⭐⯪ (1.5점 이상)</option>
               <option value="1.0">⭐ (1.0점 이상)</option>
               <option value="0.5">⯪ (0.5점 이상)</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>정렬 기준</label>
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <option value="recent">최근 등록순 📅</option>
+              <option value="rating">별점 높은순 ⭐</option>
             </select>
           </div>
         </div>
@@ -845,7 +862,7 @@ function App() {
               <span className="modal-region">{selectedRestaurant.region}</span>
               <h2>{selectedRestaurant.name}</h2>
               <div className="modal-recommender">
-                <span>추천 헌터:</span>
+                <span>추천인:</span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   <img src={members[selectedRestaurant.member]?.avatar} className="avatar-mini-inline" alt="" />
                   <strong>{members[selectedRestaurant.member]?.name} ({members[selectedRestaurant.member]?.role})</strong>
@@ -863,6 +880,18 @@ function App() {
                 <p className="detailed-address">{selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'}</p>
               </div>
               <div className="detail-row">
+                <span className="detail-label">🍲 추천 대표 메뉴</span>
+                <p className="highlight-menu">{selectedRestaurant.recomMenu}</p>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">💬 생생 검증 한줄평</span>
+                <p className="detailed-review">"{selectedRestaurant.review}"</p>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">🏷️ 추천 포인트 태그</span>
+                <div className="detail-tags">{selectedRestaurant.tags.map((t, idx) => <span key={idx} className="tag-item">#{t}</span>)}</div>
+              </div>
+              <div className="detail-row">
                 <span className="detail-label">🔗 Kakao Map 매장 정보 바로가기</span>
                 {selectedRestaurant.mapUrl ? (
                   <a href={selectedRestaurant.mapUrl} target="_blank" rel="noopener noreferrer" className="modal-external-map-btn">
@@ -874,7 +903,7 @@ function App() {
                   </a>
                 )}
               </div>
-              <div className="detail-row">
+              <div className="detail-row border-none">
                 <span className="detail-label">🚗 내비게이션 길안내 바로가기</span>
                 <div className="navigation-buttons-container">
                   <a 
@@ -918,18 +947,6 @@ function App() {
                     ❤️ 티맵(Tmap) 길안내
                   </a>
                 </div>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">🍲 추천 대표 메뉴</span>
-                <p className="highlight-menu">{selectedRestaurant.recomMenu}</p>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">💬 생생 검증 한줄평</span>
-                <p className="detailed-review">"{selectedRestaurant.review}"</p>
-              </div>
-              <div className="detail-row border-none">
-                <span className="detail-label">🏷️ 추천 포인트 태그</span>
-                <div className="detail-tags">{selectedRestaurant.tags.map((t, idx) => <span key={idx} className="tag-item">#{t}</span>)}</div>
               </div>
             </div>
           </div>
