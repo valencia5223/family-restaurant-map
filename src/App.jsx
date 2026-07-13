@@ -132,8 +132,8 @@ function App() {
     setActiveProfile(key);
     if (key) {
       localStorage.setItem('active_profile', key);
-      // 프로필 변경 시 해당 구성원의 맛집 맛 hunter 중심 필터링 자동 활성화
-      setSelectedMember(key);
+      // 프로필 변경 시에도 누구의 맛집 선택은 기본적으로 가족 전체('all')로 시작
+      setSelectedMember('all');
     } else {
       localStorage.removeItem('active_profile');
     }
