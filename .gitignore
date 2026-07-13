@@ -30,3 +30,21 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# 맛집 앱 제외 다른 서브 프로젝트들 차단
+/yuna_nutrition_tracker/
+/flask_app/
+/creep_company_game/
+/road_to_threez/
+/node-portable/
+/Family_MatZip/
+/assets/
+/Family-Restaurant-Map-backup/
+/*.py
+/*.spec
+/*.bat
+/Procedure_Analysis*.json
+/query*.json
+/connection*.json
+/snippets.json
+-DESKTOP-ACMQULK.gitignore

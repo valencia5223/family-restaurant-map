@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { members, regions, foodCategories, defaultRestaurants } from './restaurantData';
+import { supabase } from './supabase';
 import './App.css';
 
 // ──────────────────────────────────────────────────
@@ -53,15 +54,51 @@ function App() {
   }, []);
 
 
-  // 1. 맛집 추천 리스트 상태 제어 (Local Storage 연동)
-  const [restaurants, setRestaurants] = useState(() => {
-    const stored = localStorage.getItem('family_restaurants');
-    if (stored) {
-      try { return JSON.parse(stored); }
-      catch (e) { console.error('parse error', e); }
+  // 1. 맛집 추천 리스트 상태 제어 (Supabase database 연동)
+  const [restaurants, setRestaurants] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchRestaurants() {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('restaurants')
+          .select('*')
+          .order('id', { ascending: true }); // ID 기준 정렬
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          // camelCase 맵핑
+          const clientData = data.map(r => ({
+            id: r.id,
+            name: r.name,
+            member: r.member,
+            region: r.region,
+            category: r.category,
+            rating: r.rating,
+            recomMenu: r.recom_menu || r.recomMenu || '전체 대표 메뉴',
+            review: r.review,
+            tags: r.tags || [],
+            address: r.address || '주소 정보 없음',
+            mapUrl: r.map_url || r.mapUrl || null,
+            coords: r.coords || []
+          }));
+          setRestaurants(clientData);
+        } else {
+          // DB가 비어 있다면 기본값 이식
+          setRestaurants(defaultRestaurants);
+        }
+      } catch (err) {
+        console.error('[Supabase 로드 오류] 로컬 샘플 가동:', err);
+        setRestaurants(defaultRestaurants);
+      } finally {
+        setIsLoading(false);
+      }
     }
-    return defaultRestaurants;
-  });
+    fetchRestaurants();
+  }, []);
 
   // 검색 및 다중 필터링 조건 상태
   const [selectedMember, setSelectedMember] = useState('all');
@@ -313,47 +350,76 @@ function App() {
   // ──────────────────────────────────────────────────
   // 7. 새 맛집 등록 저장
   // ──────────────────────────────────────────────────
-  const saveNewRecommendation = (e) => {
+  const saveNewRecommendation = async (e) => {
     e.preventDefault();
     if (!newRest.name.trim()) return alert('식당 이름을 적어주세요.');
     if (!newRest.review.trim()) return alert('식당 후기를 적어주세요.');
 
     const cleanTags = newRest.tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
 
-    const addedObj = {
+    const dbObj = {
       id: Date.now(),
       name: newRest.name.trim(),
       member: newRest.member,
       region: newRest.region,
       category: newRest.category,
       rating: parseInt(newRest.rating, 10),
-      recomMenu: newRest.recomMenu.trim() || '전체 대표 메뉴',
+      recom_menu: newRest.recomMenu.trim() || '전체 대표 메뉴',
       review: newRest.review.trim(),
       tags: cleanTags.length > 0 ? cleanTags : ['추천맛집'],
       address: newRest.address.trim() || '주소 정보 없음',
-      mapUrl: newRest.mapUrl.trim() || null,
+      map_url: newRest.mapUrl.trim() || null,
       coords: [formLat, formLng]
     };
 
-    const updatedList = [...restaurants, addedObj];
-    setRestaurants(updatedList);
-    localStorage.setItem('family_restaurants', JSON.stringify(updatedList));
-    setIsAddingNew(false);
-    setNewRest({ name: '', member: 'papa', region: '서울', category: 'korean', rating: 5, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: '' });
-    setFormLat(37.5665);
-    setFormLng(126.9780);
+    try {
+      const { error } = await supabase.from('restaurants').insert([dbObj]);
+      if (error) throw error;
+
+      const clientObj = {
+        id: dbObj.id,
+        name: dbObj.name,
+        member: dbObj.member,
+        region: dbObj.region,
+        category: dbObj.category,
+        rating: dbObj.rating,
+        recomMenu: dbObj.recom_menu,
+        review: dbObj.review,
+        tags: dbObj.tags,
+        address: dbObj.address,
+        mapUrl: dbObj.map_url,
+        coords: dbObj.coords
+      };
+
+      setRestaurants(prev => [...prev, clientObj]);
+      setIsAddingNew(false);
+      setNewRest({ name: '', member: 'papa', region: '서울', category: 'korean', rating: 5, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: '' });
+      setFormLat(37.5665);
+      setFormLng(126.9780);
+    } catch (err) {
+      console.error('[등록 오류]', err);
+      alert('데이터베이스 저장 중 오류가 발생했습니다: ' + err.message);
+    }
   };
 
   // ──────────────────────────────────────────────────
   // 8. 맛집 삭제
   // ──────────────────────────────────────────────────
-  const deleteRecommendation = (id, e) => {
+  const deleteRecommendation = async (id, e) => {
     e.stopPropagation();
     if (!window.confirm('정말 이 맛집 추천을 삭제하시겠습니까?')) return;
-    const updatedList = restaurants.filter(r => r.id !== id);
-    setRestaurants(updatedList);
-    localStorage.setItem('family_restaurants', JSON.stringify(updatedList));
-    if (selectedRestaurant && selectedRestaurant.id === id) setSelectedRestaurant(null);
+
+    try {
+      const { error } = await supabase.from('restaurants').delete().eq('id', id);
+      if (error) throw error;
+
+      const updatedList = restaurants.filter(r => r.id !== id);
+      setRestaurants(updatedList);
+      if (selectedRestaurant && selectedRestaurant.id === id) setSelectedRestaurant(null);
+    } catch (err) {
+      console.error('[삭제 오류]', err);
+      alert('데이터베이스 삭제 중 오류가 발생했습니다: ' + err.message);
+    }
   };
 
   // ──────────────────────────────────────────────────
