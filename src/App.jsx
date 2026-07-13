@@ -725,13 +725,6 @@ function App() {
               <option value="0.5">⯪ (0.5점 이상)</option>
             </select>
           </div>
-          <div className="filter-group">
-            <label>정렬 기준</label>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="recent">최근 등록순 📅</option>
-              <option value="rating">별점 높은순 ⭐</option>
-            </select>
-          </div>
         </div>
       </section>
 
@@ -757,6 +750,17 @@ function App() {
 
       {/* 메인 컨텐츠 */}
       <main className="bistro-main">
+        {viewMode === 'list' && (
+          <div className="list-header-section">
+            <h3 className="list-title">🍽️ 가족 추천 맛집 목록 <span className="total-count">({filteredRestaurants.length}곳)</span></h3>
+            <div className="list-sort-select">
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-dropdown-inline">
+                <option value="recent">최근 등록순 📅</option>
+                <option value="rating">별점 높은순 ⭐</option>
+              </select>
+            </div>
+          </div>
+        )}
         {viewMode === 'list' ? (
           filteredRestaurants.length > 0 ? (
             <div className="bistro-grid">

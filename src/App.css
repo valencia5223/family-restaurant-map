@@ -1558,3 +1558,73 @@ body {
   border-radius: 50%;
   object-fit: cover;
 }
+
+/* 📋 맛집 리스트 상단 헤더 섹션 (정렬 셀렉터 결합) */
+.list-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+
+.list-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #2c2623;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.list-title .total-count {
+  font-size: 0.95rem;
+  color: var(--color-brand);
+  font-weight: 700;
+}
+
+.sort-dropdown-inline {
+  padding: 6px 28px 6px 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #4a3f3b;
+  background-color: #ffffff;
+  border: 1.5px solid #d4c5c0;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a3f3b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.sort-dropdown-inline:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(224, 92, 54, 0.15);
+}
+
+@media (max-width: 480px) {
+  .list-header-section {
+    margin-bottom: 10px;
+  }
+  .list-title {
+    font-size: 0.98rem;
+  }
+  .list-title .total-count {
+    font-size: 0.85rem;
+  }
+  .sort-dropdown-inline {
+    font-size: 0.78rem;
+    padding: 5px 24px 5px 8px;
+    background-size: 14px;
+    background-position: right 6px center;
+    border-radius: 6px;
+  }
+}
