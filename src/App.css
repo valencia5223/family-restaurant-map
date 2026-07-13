@@ -152,7 +152,7 @@ body {
 
 .search-box {
   position: relative;
-  flex: 1.4;
+  flex: 0.8; /* 식당명 검색창 가로 비중 조율 축소 */
 }
 
 .search-box input {
@@ -202,13 +202,14 @@ body {
 .select-filters {
   display: flex;
   gap: 1rem;
-  flex: 1;
+  flex: 1.8; /* 필터 영역 가로 비중 확대 확보 */
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 120px; /* 최소 가로폭 지정으로 글자 찌그러짐 방지 */
 }
 
 .filter-group label {
@@ -1871,4 +1872,36 @@ body {
   background-color: var(--color-brand-muted);
   color: var(--color-brand);
   font-weight: 600;
+}
+
+/* 📱 모바일 및 테블릿 해상도 최적화 (검색/필터 영역이 세로로 흐르거나 적절히 배분되도록 수정) */
+@media (max-width: 768px) {
+  .search-filter-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1.2rem;
+  }
+  
+  .search-box {
+    width: 100%;
+    flex: none;
+  }
+  
+  .select-filters {
+    width: 100%;
+    flex: none;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+  
+  .filter-group {
+    flex: 1 1 calc(50% - 0.4rem);
+    min-width: unset;
+  }
+  
+  /* 별점 선택은 텍스트가 상대적으로 길어 단독 줄로 온전하게 100% 면적 부여 */
+  .filter-group:last-child {
+    flex: 1 1 100%;
+  }
 }
