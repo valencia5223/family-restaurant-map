@@ -92,6 +92,21 @@ const resizeImage = (file) => {
   });
 };
 
+// 📏 두 경위도 좌표 간 실제 통행 거리 계산 (Haversine 공식, 단위: km)
+const getDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // 지구 반경
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 // ──────────────────────────────────────────────────
 // 메인 App 컴포넌트
 // ──────────────────────────────────────────────────
@@ -190,7 +205,8 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedRating, setSelectedRating] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'rating'
+  const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'rating' | 'distance'
+  const [userLocation, setUserLocation] = useState(null); // 내 기기 GPS 좌표 {lat, lng}
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
   // 뷰 모드 토글: 'list' vs 'map'
@@ -248,38 +264,50 @@ function App() {
   // ──────────────────────────────────────────────────
   const filteredRestaurants = useMemo(() => {
     const filtered = restaurants.filter(r => {
-      const matchMember = selectedMember === 'all' || r.member === selectedMember;
-      const matchRegion = selectedRegion === 'all' || r.region === selectedRegion;
-      const matchCategory = selectedCategory === 'all' || r.category === selectedCategory;
-      
-      let matchRating = true;
+      // 1) 작성자 필터
+      if (selectedMember !== 'all' && r.member !== selectedMember) return false;
+      // 2) 지역 필터
+      if (selectedRegion !== 'all' && r.region !== selectedRegion) return false;
+      // 3) 요리 카테고리 필터
+      if (selectedCategory !== 'all' && r.category !== selectedCategory) return false;
+      // 4) 평점 필터 (선택 점수 이상 출력)
       if (selectedRating !== 'all') {
-        const ratingVal = parseFloat(selectedRating);
-        if (ratingVal >= 5.0) {
-          matchRating = parseFloat(r.rating) >= 5.0;
-        } else {
-          matchRating = parseFloat(r.rating) >= ratingVal;
-        }
+        const minRating = parseFloat(selectedRating);
+        if (r.rating < minRating) return false;
       }
-
-      const text = searchTerm.toLowerCase();
-      const matchSearch = r.name.toLowerCase().includes(text) ||
-        r.recomMenu.toLowerCase().includes(text) ||
-        (r.address && r.address.toLowerCase().includes(text)) ||
-        r.review.toLowerCase().includes(text) ||
-        r.tags.some(t => t.toLowerCase().includes(text));
-      return matchMember && matchRegion && matchCategory && matchRating && matchSearch;
+      // 5) 상호명 검색어 필터
+      if (searchTerm.trim() !== '') {
+        const term = searchTerm.toLowerCase();
+        const matchesName = r.name.toLowerCase().includes(term);
+        const matchesTags = r.tags.some(t => t.toLowerCase().includes(term));
+        const matchesMenu = r.recomMenu.toLowerCase().includes(term);
+        if (!matchesName && !matchesTags && !matchesMenu) return false;
+      }
+      return true;
     });
 
-    // 최근등록순(최근 등록일/시간)과 별점높은순 정렬 옵션 지원
-    return [...filtered].sort((a, b) => {
-      if (sortBy === 'rating') {
-        const ratingDiff = parseFloat(b.rating) - parseFloat(a.rating);
-        if (ratingDiff !== 0) return ratingDiff;
+    // 🏆 대단히 유연한 정렬 적용 (최근 등록순 우선 vs 평점 높은순 vs 거리 가까운순)
+    return filtered.sort((a, b) => {
+      if (sortBy === 'distance' && userLocation) {
+        const distA = (a.coords && a.coords.length === 2) 
+          ? getDistance(userLocation.lat, userLocation.lng, a.coords[0], a.coords[1]) 
+          : Infinity;
+        const distB = (b.coords && b.coords.length === 2) 
+          ? getDistance(userLocation.lat, userLocation.lng, b.coords[0], b.coords[1]) 
+          : Infinity;
+        if (distA !== distB) return distA - distB;
+        return b.id - a.id;
       }
+      if (sortBy === 'rating') {
+        if (b.rating !== a.rating) {
+          return b.rating - a.rating; // 1차 정렬: 평점 내림차순
+        }
+        return b.id - a.id; // 2차 정렬: 최신 ID 내림차순
+      }
+      // 기본값: 'recent' (최근 등록순)
       return b.id - a.id;
     });
-  }, [restaurants, selectedMember, selectedRegion, selectedCategory, selectedRating, searchTerm, sortBy]);
+  }, [restaurants, selectedMember, selectedRegion, selectedCategory, selectedRating, searchTerm, sortBy, userLocation]);
 
   // ──────────────────────────────────────────────────
   // 4-A. 카카오 장소 검색 자동완성 (디바운스 300ms)
@@ -394,6 +422,11 @@ function App() {
     // 기존 인스턴스 정리
     if (mainMapRef.current) {
       mainMapRef.current = null;
+    }
+    // 지도 리셋 시 이전 현위치 마커 제거
+    if (window.myLocationMarker) {
+      window.myLocationMarker.setMap(null);
+      window.myLocationMarker = null;
     }
     if (viewMode !== 'map') return;
     if (!window.kakao || !window.kakao.maps) return;
@@ -828,7 +861,16 @@ function App() {
                       </div>
                     )}
                     <div className="card-header" style={{ borderTopLeftRadius: rest.photo ? '0' : '12px', borderTopRightRadius: rest.photo ? '0' : '12px' }}>
-                      <span className="region-tag">{rest.region}</span>
+                      <span className="region-tag">
+                        {rest.region}
+                        {(() => {
+                          if (userLocation && rest.coords && rest.coords.length === 2) {
+                            const d = getDistance(userLocation.lat, userLocation.lng, rest.coords[0], rest.coords[1]);
+                            return ` • ${d < 1 ? Math.round(d * 1000) + 'm' : d.toFixed(1) + 'km'}`;
+                          }
+                          return '';
+                        })()}
+                      </span>
                       <span className="category-emoji">{categoryEmoji}</span>
                     </div>
                     <h3 className="restaurant-title">{rest.name}</h3>
@@ -863,10 +905,53 @@ function App() {
             </div>
           )
         ) : (
-          <div className="map-view-wrapper">
+          <div className="map-view-wrapper" style={{ position: 'relative' }}>
             {filteredRestaurants.length === 0 && (
               <div className="map-empty-alert">⚠️ 선택된 필터 조건에 지도상 표출 가능한 맛집이 없습니다.</div>
             )}
+            <button 
+              onClick={() => {
+                if (!navigator.geolocation) {
+                  alert('위치 찾기(GPS)를 브라우저에서 사용할 수 없습니다.');
+                  return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                  (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    setUserLocation({ lat, lng });
+                    if (mainMapRef.current) {
+                      const moveLatLon = new window.kakao.maps.LatLng(lat, lng);
+                      mainMapRef.current.setCenter(moveLatLon);
+                      mainMapRef.current.setLevel(5); // 현위치를 보기 쉽게 근거리 줌레벨로 확대 설정
+                      
+                      // 이전 현위치 마커가 있다면 맵에서 언마운트 처리
+                      if (window.myLocationMarker) {
+                        window.myLocationMarker.setMap(null);
+                      }
+                      
+                      const markerContent = document.createElement('div');
+                      markerContent.className = 'my-gps-marker';
+                      
+                      const gpsOverlay = new window.kakao.maps.CustomOverlay({
+                        position: moveLatLon,
+                        content: markerContent,
+                        yAnchor: 0.5
+                      });
+                      gpsOverlay.setMap(mainMapRef.current);
+                      window.myLocationMarker = gpsOverlay;
+                    }
+                  },
+                  (err) => {
+                    console.error('현위치 이동 실패:', err);
+                    alert('현지 위치 조회가 지연되거나 불가능합니다. 기기 설정의 위치 접근 권한을 확인해주세요.');
+                  }
+                );
+              }}
+              className="map-gps-btn"
+            >
+              📍 내 현위치 기준으로 지도 이동
+            </button>
             <div id="family-map"></div>
           </div>
         )}
@@ -1238,7 +1323,7 @@ function App() {
 
               <div className="form-actions">
                 <button type="button" className="cancel-act-btn" onClick={() => setIsAddingNew(false)}>취소</button>
-                <button type="submit" className="submit-act-btn">가족 지도형 보관소에 제출</button>
+                <button type="submit" className="submit-act-btn">저장</button>
               </div>
             </form>
           </div>
