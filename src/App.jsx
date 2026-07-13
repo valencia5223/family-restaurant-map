@@ -1326,12 +1326,12 @@ function App() {
                 <div className="form-group">
                   <label>추천 작성자</label>
                   <select value={newRest.member} onChange={(e) => setNewRest({ ...newRest, member: e.target.value })}>
-                    <option value="papa">아빠</option>
-                    <option value="mama">엄마</option>
-                    <option value="daughter">큰딸</option>
-                    <option value="makdung">작은딸</option>
-                    <option value="husband">사위</option>
-                    <option value="yuna">차유나(손주)</option>
+                    <option value="papa">할비</option>
+                    <option value="mama">할미</option>
+                    <option value="daughter">이모</option>
+                    <option value="makdung">엄마</option>
+                    <option value="husband">아빠</option>
+                    <option value="yuna">차유나</option>
                   </select>
                 </div>
               </div>
@@ -1526,12 +1526,12 @@ function App() {
                 <div className="form-group">
                   <label>추천 작성자</label>
                   <select value={editingRest.member} onChange={(e) => setEditingRest({ ...editingRest, member: e.target.value })}>
-                    <option value="papa">아빠</option>
-                    <option value="mama">엄마</option>
-                    <option value="daughter">큰딸</option>
-                    <option value="makdung">작은딸</option>
-                    <option value="husband">사위</option>
-                    <option value="yuna">차유나(손주)</option>
+                    <option value="papa">할비</option>
+                    <option value="mama">할미</option>
+                    <option value="daughter">이모</option>
+                    <option value="makdung">엄마</option>
+                    <option value="husband">아빠</option>
+                    <option value="yuna">차유나</option>
                   </select>
                 </div>
               </div>
