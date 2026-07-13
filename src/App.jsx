@@ -1368,6 +1368,15 @@ function App() {
                 />
               </div>
 
+              {/* 미니 카카오맵 핀드롭 */}
+              <div className="form-group">
+                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
+                <div id="mini-map"></div>
+                <div className="mini-map-coord-display">
+                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
+                </div>
+              </div>
+
               <div className="form-group">
                 <label>추천메뉴</label>
                 <input type="text" placeholder="예: 수육백반, 순대국밥" value={newRest.recomMenu} onChange={(e) => setNewRest({ ...newRest, recomMenu: e.target.value })} />
@@ -1450,14 +1459,7 @@ function App() {
                 />
               </div>
 
-              {/* 미니 카카오맵 핀드롭 */}
-              <div className="form-group">
-                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
-                <div id="mini-map"></div>
-                <div className="mini-map-coord-display">
-                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
-                </div>
-              </div>
+
 
               <div className="form-actions">
                 <button type="button" className="cancel-act-btn" onClick={() => setIsAddingNew(false)}>취소</button>
@@ -1566,6 +1568,15 @@ function App() {
                 />
               </div>
 
+              {/* 미니 카카오맵 핀드롭 */}
+              <div className="form-group">
+                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
+                <div id="mini-map"></div>
+                <div className="mini-map-coord-display">
+                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
+                </div>
+              </div>
+
               <div className="form-group">
                 <label>추천메뉴</label>
                 <input type="text" placeholder="예: 수육백반, 순대국밥" value={editingRest.recomMenu} onChange={(e) => setEditingRest({ ...editingRest, recomMenu: e.target.value })} />
@@ -1648,14 +1659,7 @@ function App() {
                 />
               </div>
 
-              {/* 미니 카카오맵 핀드롭 */}
-              <div className="form-group">
-                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
-                <div id="mini-map"></div>
-                <div className="mini-map-coord-display">
-                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
-                </div>
-              </div>
+
 
               <div className="form-actions">
                 <button type="button" className="cancel-act-btn" onClick={() => { setIsEditing(false); setEditingRest(null); }}>취소</button>
