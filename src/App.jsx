@@ -18,9 +18,15 @@ const memberProfiles = {
 function mapAddressToRegion(address) {
   if (!address) return '서울';
   if (address.includes('서울')) return '서울';
-  if (address.includes('경기') || address.includes('인천')) return '경기';
-  if (address.includes('부산') || address.includes('경상') || address.includes('대구') || address.includes('울산')) return '부산';
-  return '강원';
+  if (address.includes('경기') || address.includes('인천')) return '경기/인천';
+  if (address.includes('부산') || address.includes('울산') || address.includes('경남') || address.includes('경상남')) return '부산/울산/경남';
+  if (address.includes('대구') || address.includes('경북') || address.includes('경상북')) return '대구/경북';
+  if (address.includes('전북') || address.includes('전라북')) return '전북';
+  if (address.includes('전남') || address.includes('전라남') || address.includes('광주')) return '전남/광주';
+  if (address.includes('강원')) return '강원';
+  if (address.includes('충청') || address.includes('충북') || address.includes('충남') || address.includes('세종') || address.includes('대전')) return '충청/세종/대전';
+  if (address.includes('제주')) return '제주';
+  return '서울';
 }
 
 // 카카오 카테고리 코드 → 음식 종류 자동 매핑 헬퍼
