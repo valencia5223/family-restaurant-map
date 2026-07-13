@@ -3,6 +3,15 @@ import { members, regions, foodCategories, defaultRestaurants } from './restaura
 import { supabase } from './supabase';
 import './App.css';
 
+// 넷플릭스 스타일 프로필을 위한 매핑 정보
+const memberProfiles = {
+  papa: { name: '아빠', emoji: '👨‍💼' },
+  mama: { name: '엄마', emoji: '👩‍🍳' },
+  daughter: { name: '큰딸 랑구', emoji: '🙋‍♀️' },
+  makdung: { name: '작은딸 막둥이', emoji: '👧' },
+  husband: { name: '사위 차서방', emoji: '🙋‍♂️' }
+};
+
 // ──────────────────────────────────────────────────
 // 주소 → 지역 자동 매핑 헬퍼
 // ──────────────────────────────────────────────────
@@ -57,6 +66,22 @@ function App() {
   // 1. 맛집 추천 리스트 상태 제어 (Supabase database 연동)
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // 🎭 넷플릭스 프로필 세션 상태 제어
+  const [activeProfile, setActiveProfile] = useState(() => {
+    return localStorage.getItem('active_profile') || null;
+  });
+
+  const handleProfileChange = (key) => {
+    setActiveProfile(key);
+    if (key) {
+      localStorage.setItem('active_profile', key);
+      // 프로필 변경 시 해당 구성원의 맛집 맛 hunter 중심 필터링 자동 활성화
+      setSelectedMember(key);
+    } else {
+      localStorage.removeItem('active_profile');
+    }
+  };
 
   useEffect(() => {
     async function fetchRestaurants() {
@@ -311,6 +336,14 @@ function App() {
   // ──────────────────────────────────────────────────
   // 6. 등록 모달 미니 카카오맵 렌더링
   // ──────────────────────────────────────────────────
+  // 6. 새 맛집 등록창 열기
+  const handleAddNewClick = () => {
+    setIsAddingNew(true);
+    if (activeProfile && memberProfiles[activeProfile]) {
+      setNewRest(prev => ({ ...prev, member: activeProfile }));
+    }
+  };
+
   useEffect(() => {
     if (!isAddingNew) {
       miniMapRef.current = null;
@@ -425,14 +458,50 @@ function App() {
   // ──────────────────────────────────────────────────
   // RENDER
   // ──────────────────────────────────────────────────
+  // 🎭 프로필이 선택되지 않았다면 넷플릭스 오버레이 노출
+  if (!activeProfile) {
+    return (
+      <div className="profile-select-overlay">
+        <div className="profile-select-container">
+          <h1 className="profile-select-title">누가 온 가족 맛지도를 열어볼까요?</h1>
+          <div className="profile-cards-container">
+            {Object.entries(memberProfiles).map(([key, prof]) => (
+              <div
+                key={key}
+                className="profile-card"
+                onClick={() => handleProfileChange(key)}
+              >
+                <div className="profile-avatar-wrapper">
+                  {prof.emoji}
+                </div>
+                <div className="profile-name">{prof.name}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bistro-app">
+      {/* 🎭 상단 헤더 프로필 퀵 스위처 */}
+      <div className="header-profile-section">
+        <div className="header-profile-badge">
+          <span className="header-profile-emoji">{memberProfiles[activeProfile]?.emoji}</span>
+          <span>{memberProfiles[activeProfile]?.name} 헌터</span>
+          <button className="header-profile-btn" onClick={() => handleProfileChange(null)}>
+            전환
+          </button>
+        </div>
+      </div>
+
       {/* 헤더 */}
       <header className="bistro-header">
         <div className="header-icon">🧭</div>
         <h1>우리 가족 비밀 맛집 지도</h1>
         <p className="subtitle">아빠, 엄마, 딸, 사위가 발로 직접 찾아낸 맛집 공유 보관소</p>
-        <button className="add-bistro-btn" onClick={() => setIsAddingNew(true)}>
+        <button className="add-bistro-btn" onClick={handleAddNewClick}>
           ✍️ 내가 검증한 맛집 추천하기
         </button>
       </header>

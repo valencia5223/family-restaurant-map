@@ -1095,3 +1095,213 @@ body {
 .select-three {
   grid-template-columns: 1fr 1fr 1fr !important;
 }
+
+/* ==========================================================================
+   🎭 넷플릭스 스타일 프로필 선택 화면
+   ========================================================================== */
+.profile-select-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, #1a1a1a 0%, #0d0d0d 100%);
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: 'Inter', 'Outfit', 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.profile-select-container {
+  text-align: center;
+  max-width: 900px;
+  width: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.profile-select-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 3.5rem;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  animation: fadeInDown 0.8s ease;
+}
+
+.profile-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.2rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  animation: scaleUpIn 0.8s ease;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 110px;
+}
+
+.profile-card:hover {
+  transform: scale(1.15);
+}
+
+.profile-avatar-wrapper {
+  width: 100px;
+  height: 100px;
+  background-color: #2b2b2b;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.2rem;
+  border: 3.5px solid transparent;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+}
+
+.profile-card:nth-child(1) .profile-avatar-wrapper { background-color: #3b5998; }
+.profile-card:nth-child(2) .profile-avatar-wrapper { background-color: #2ca02c; }
+.profile-card:nth-child(3) .profile-avatar-wrapper { background-color: #d62728; }
+.profile-card:nth-child(4) .profile-avatar-wrapper { background-color: #ff7f0e; }
+.profile-card:nth-child(5) .profile-avatar-wrapper { background-color: #9467bd; }
+
+.profile-card:hover .profile-avatar-wrapper {
+  border-color: #ffffff;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+}
+
+.profile-name {
+  margin-top: 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #a0a0a0;
+  transition: color 0.3s ease;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  white-space: nowrap;
+}
+
+.profile-card:hover .profile-name {
+  color: #ffffff;
+}
+
+/* 메인뷰 상단 프로필 헤더 배지 스위처 */
+.header-profile-section {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 1000;
+}
+
+.header-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--color-border);
+  padding: 0.45rem 1rem;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.header-profile-badge:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(44, 38, 35, 0.15);
+}
+
+.header-profile-emoji {
+  font-size: 1.2rem;
+}
+
+.header-profile-btn {
+  background: var(--color-rust);
+  color: #ffffff;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 5px rgba(224, 86, 36, 0.3);
+}
+
+.header-profile-btn:hover {
+  background: #C45037;
+  transform: translateY(-1px);
+}
+
+.header-profile-btn:active {
+  transform: translateY(0);
+}
+
+/* 애니메이션 */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleUpIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 모바일 반응형 조절 */
+@media (max-width: 600px) {
+  .profile-select-title {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+  }
+  .profile-cards-container {
+    gap: 1.2rem;
+  }
+  .profile-avatar-wrapper {
+    width: 80px;
+    height: 80px;
+    font-size: 2.5rem;
+  }
+  .profile-card {
+    width: 90px;
+  }
+  .profile-name {
+    font-size: 0.85rem;
+    margin-top: 0.6rem;
+  }
+  .header-profile-section {
+    position: static;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+    width: 100%;
+  }
+}
