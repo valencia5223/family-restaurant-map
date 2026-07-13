@@ -41,6 +41,11 @@ drop policy if exists "공개 삭제 허용" on restaurants;
 create policy "공개 삭제 허용" on restaurants 
   for delete using (true);
 
+-- (4) 수정 권한: 누구나 수정할 수 있도록 설정
+drop policy if exists "공개 수정 허용" on restaurants;
+create policy "공개 수정 허용" on restaurants 
+  for update using (true) with check (true);
+
 -- ==========================================
 -- 📊 3. 초기 기본 소스 데이터 (기본값) 이식
 -- 로컬스토리지가 비어 있는 최초 기동 시에도 마더 맛집 4개가 노출되도록
