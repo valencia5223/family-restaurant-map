@@ -367,12 +367,22 @@ function App() {
     filteredRestaurants.forEach(rest => {
       if (!rest.coords || rest.coords.length !== 2) return;
       const [lat, lng] = rest.coords;
-      const memInfo = members[rest.member] || { avatar: '👤', name: '가족' };
+      const memInfo = members[rest.member] || { avatar: '/avatars/avatar_papa.png', name: '가족' };
 
       const markerPosition = new window.kakao.maps.LatLng(lat, lng);
-      const marker = new window.kakao.maps.Marker({ position: markerPosition });
-      marker.setMap(map);
-      mainMarkersRef.current.push(marker);
+      
+      // 🎨 추천인의 개별 이미지 아바타 기반 커스텀 마커(CustomOverlay) 생성
+      const overlayContent = document.createElement('div');
+      overlayContent.className = 'custom-avatar-marker';
+      overlayContent.innerHTML = `<img src="${memInfo.avatar}" alt="${memInfo.name}" />`;
+      
+      const customOverlay = new window.kakao.maps.CustomOverlay({
+        position: markerPosition,
+        content: overlayContent,
+        yAnchor: 1.15
+      });
+      customOverlay.setMap(map);
+      mainMarkersRef.current.push(customOverlay);
 
       const infoContent = `
         <div style="padding:14px 16px;min-width:200px;font-family:'Pretendard',sans-serif;border-radius:12px;">
@@ -388,9 +398,14 @@ function App() {
           </div>
         </div>`;
 
-      const infowindow = new window.kakao.maps.InfoWindow({ content: infoContent, removable: true });
-      window.kakao.maps.event.addListener(marker, 'click', () => {
-        infowindow.open(map, marker);
+      const infowindow = new window.kakao.maps.InfoWindow({ 
+        position: markerPosition,
+        content: infoContent, 
+        removable: true 
+      });
+
+      overlayContent.addEventListener('click', () => {
+        infowindow.open(map);
       });
     });
 
