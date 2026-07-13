@@ -876,8 +876,18 @@ function App() {
                 <div className="stars-holder">{renderStars(selectedRestaurant.rating)}<span className="score-num">({parseFloat(selectedRestaurant.rating).toFixed(1)} / 5.0)</span></div>
               </div>
               <div className="detail-row">
-                <span className="detail-label">📍 식당 도로명 주소</span>
-                <p className="detailed-address">{selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'}</p>
+                <span className="detail-label">📍 식당 도로명 주소 (클릭 시 카카오맵 이동)</span>
+                <p className="detailed-address">
+                  {selectedRestaurant.mapUrl && selectedRestaurant.mapUrl.includes('kakao.com') ? (
+                    <a href={selectedRestaurant.mapUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)', textDecoration: 'underline', fontWeight: 600 }}>
+                      {selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'} ↗
+                    </a>
+                  ) : (
+                    <a href={`https://map.kakao.com/?q=${encodeURIComponent(selectedRestaurant.address || selectedRestaurant.name)}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)', textDecoration: 'underline', fontWeight: 600 }}>
+                      {selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'} ↗
+                    </a>
+                  )}
+                </p>
               </div>
               <div className="detail-row">
                 <span className="detail-label">🍲 추천 대표 메뉴</span>
@@ -891,18 +901,14 @@ function App() {
                 <span className="detail-label">🏷️ 추천 포인트 태그</span>
                 <div className="detail-tags">{selectedRestaurant.tags.map((t, idx) => <span key={idx} className="tag-item">#{t}</span>)}</div>
               </div>
-              <div className="detail-row">
-                <span className="detail-label">🔗 Kakao Map 매장 정보 바로가기</span>
-                {selectedRestaurant.mapUrl ? (
-                  <a href={selectedRestaurant.mapUrl} target="_blank" rel="noopener noreferrer" className="modal-external-map-btn">
-                    🖥️ 카카오맵 상세 정보 및 리뷰 보기 ↗
+              {selectedRestaurant.mapUrl && !selectedRestaurant.mapUrl.includes('kakao.com') && (
+                <div className="detail-row">
+                  <span className="detail-label">🔗 업체 홈페이지</span>
+                  <a href={selectedRestaurant.mapUrl} target="_blank" rel="noopener noreferrer" className="modal-external-map-btn" style={{ wordBreak: 'break-all' }}>
+                    🖥️ 업체 홈페이지 바로가기 ↗
                   </a>
-                ) : (
-                  <a href={`https://map.kakao.com/?q=${encodeURIComponent(selectedRestaurant.name)}`} target="_blank" rel="noopener noreferrer" className="modal-external-map-btn">
-                    🔍 카카오맵에서 상점 정보 검색 ↗
-                  </a>
-                )}
-              </div>
+                </div>
+              )}
               <div className="detail-row border-none">
                 <span className="detail-label">🚗 내비게이션 길안내 바로가기</span>
                 <div className="navigation-buttons-container">
