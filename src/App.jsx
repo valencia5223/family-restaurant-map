@@ -1336,43 +1336,25 @@ function App() {
                 </div>
               </div>
 
-              {/* 지역 / 카테고리 / 별점 - 자동완성 선택 시 자동입력됨 */}
-              <div className="row-fields select-three">
-                <div className="form-group">
-                  <label>도시 구역 (자동)</label>
-                  <select value={newRest.region} onChange={(e) => setNewRest({ ...newRest, region: e.target.value })}>
-                    {regions.filter(r => r.id !== 'all').map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>음식 종류 (자동)</label>
-                  <select value={newRest.category} onChange={(e) => setNewRest({ ...newRest, category: e.target.value })}>
-                    {foodCategories.filter(c => c.id !== 'all').map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>내 추천 별점</label>
-                  <RatingSelect
-                    value={newRest.rating}
-                    onChange={(val) => setNewRest({ ...newRest, rating: parseFloat(val) })}
-                    options={[
-                      { value: 5.0, label: <>{renderStars(5.0)} <span className="rating-desc">(5.0 / 강력 추천)</span></> },
-                      { value: 4.5, label: <>{renderStars(4.5)} <span className="rating-desc">(4.5 / 추천)</span></> },
-                      { value: 4.0, label: <>{renderStars(4.0)} <span className="rating-desc">(4.0 / 추천)</span></> },
-                      { value: 3.5, label: <>{renderStars(3.5)} <span className="rating-desc">(3.5 / 무난함)</span></> },
-                      { value: 3.0, label: <>{renderStars(3.0)} <span className="rating-desc">(3.0 / 평범함)</span></> },
-                      { value: 2.5, label: <>{renderStars(2.5)} <span className="rating-desc">(2.5 / 아쉬움)</span></> },
-                      { value: 2.0, label: <>{renderStars(2.0)} <span className="rating-desc">(2.0 / 아쉬움)</span></> },
-                      { value: 1.5, label: <>{renderStars(1.5)} <span className="rating-desc">(1.5 / 비추)</span></> },
-                      { value: 1.0, label: <>{renderStars(1.0)} <span className="rating-desc">(1.0 / 비추)</span></> },
-                      { value: 0.5, label: <>{renderStars(0.5)} <span className="rating-desc">(0.5 / 강력 비추)</span></> }
-                    ]}
-                  />
-                </div>
+              {/* 내 추천 별점 */}
+              <div className="form-group">
+                <label>내 추천 별점</label>
+                <RatingSelect
+                  value={newRest.rating}
+                  onChange={(val) => setNewRest({ ...newRest, rating: parseFloat(val) })}
+                  options={[
+                    { value: 5.0, label: <>{renderStars(5.0)} <span className="rating-desc">(5.0 / 강력 추천)</span></> },
+                    { value: 4.5, label: <>{renderStars(4.5)} <span className="rating-desc">(4.5 / 추천)</span></> },
+                    { value: 4.0, label: <>{renderStars(4.0)} <span className="rating-desc">(4.0 / 추천)</span></> },
+                    { value: 3.5, label: <>{renderStars(3.5)} <span className="rating-desc">(3.5 / 무난함)</span></> },
+                    { value: 3.0, label: <>{renderStars(3.0)} <span className="rating-desc">(3.0 / 평범함)</span></> },
+                    { value: 2.5, label: <>{renderStars(2.5)} <span className="rating-desc">(2.5 / 아쉬움)</span></> },
+                    { value: 2.0, label: <>{renderStars(2.0)} <span className="rating-desc">(2.0 / 아쉬움)</span></> },
+                    { value: 1.5, label: <>{renderStars(1.5)} <span className="rating-desc">(1.5 / 비추)</span></> },
+                    { value: 1.0, label: <>{renderStars(1.0)} <span className="rating-desc">(1.0 / 비추)</span></> },
+                    { value: 0.5, label: <>{renderStars(0.5)} <span className="rating-desc">(0.5 / 강력 비추)</span></> }
+                  ]}
+                />
               </div>
 
               {/* 주소 (자동완성 선택 시 자동입력) */}
@@ -1384,26 +1366,6 @@ function App() {
                   value={newRest.address}
                   onChange={(e) => setNewRest({ ...newRest, address: e.target.value })}
                 />
-              </div>
-
-              {/* 카카오맵 URL (자동완성 선택 시 자동입력) */}
-              <div className="form-group">
-                <label>카카오맵 링크 (자동입력)</label>
-                <input
-                  type="url"
-                  placeholder="상호명 자동완성 선택 시 자동 입력됩니다"
-                  value={newRest.mapUrl}
-                  onChange={(e) => setNewRest({ ...newRest, mapUrl: e.target.value })}
-                />
-              </div>
-
-              {/* 미니 카카오맵 핀드롭 */}
-              <div className="form-group">
-                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
-                <div id="mini-map"></div>
-                <div className="mini-map-coord-display">
-                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
-                </div>
               </div>
 
               <div className="form-group">
@@ -1451,6 +1413,49 @@ function App() {
                       </button>
                     </div>
                   )}
+                </div>
+              </div>
+
+              <div className="divider" style={{ margin: '1.5rem 0', opacity: 0.5 }}></div>
+              <h3 style={{ fontSize: '0.92rem', color: 'var(--color-olive)', marginBottom: '1.25rem', fontWeight: 'bold' }}>ℹ️ 자동완성 연동 메타데이터 (수정 불필요)</h3>
+
+              {/* 지역 / 카테고리 - 자동완성 선택 시 자동입력됨 */}
+              <div className="row-fields">
+                <div className="form-group">
+                  <label>도시 구역 (자동)</label>
+                  <select value={newRest.region} onChange={(e) => setNewRest({ ...newRest, region: e.target.value })}>
+                    {regions.filter(r => r.id !== 'all').map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>음식 종류 (자동)</label>
+                  <select value={newRest.category} onChange={(e) => setNewRest({ ...newRest, category: e.target.value })}>
+                    {foodCategories.filter(c => c.id !== 'all').map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* 카카오맵 URL (자동완성 선택 시 자동입력) */}
+              <div className="form-group">
+                <label>카카오맵 링크 (자동입력)</label>
+                <input
+                  type="url"
+                  placeholder="상호명 자동완성 선택 시 자동 입력됩니다"
+                  value={newRest.mapUrl}
+                  onChange={(e) => setNewRest({ ...newRest, mapUrl: e.target.value })}
+                />
+              </div>
+
+              {/* 미니 카카오맵 핀드롭 */}
+              <div className="form-group">
+                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
+                <div id="mini-map"></div>
+                <div className="mini-map-coord-display">
+                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
                 </div>
               </div>
 
@@ -1529,43 +1534,25 @@ function App() {
                 </div>
               </div>
 
-              {/* 지역 / 카테고리 / 별점 - 자동완성 선택 시 자동입력됨 */}
-              <div className="row-fields select-three">
-                <div className="form-group">
-                  <label>도시 구역 (자동)</label>
-                  <select value={editingRest.region} onChange={(e) => setEditingRest({ ...editingRest, region: e.target.value })}>
-                    {regions.filter(r => r.id !== 'all').map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>음식 종류 (자동)</label>
-                  <select value={editingRest.category} onChange={(e) => setEditingRest({ ...editingRest, category: e.target.value })}>
-                    {foodCategories.filter(c => c.id !== 'all').map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>내 추천 별점</label>
-                  <RatingSelect
-                    value={editingRest.rating}
-                    onChange={(val) => setEditingRest({ ...editingRest, rating: parseFloat(val) })}
-                    options={[
-                      { value: 5.0, label: <>{renderStars(5.0)} <span className="rating-desc">(5.0 / 강력 추천)</span></> },
-                      { value: 4.5, label: <>{renderStars(4.5)} <span className="rating-desc">(4.5 / 추천)</span></> },
-                      { value: 4.0, label: <>{renderStars(4.0)} <span className="rating-desc">(4.0 / 추천)</span></> },
-                      { value: 3.5, label: <>{renderStars(3.5)} <span className="rating-desc">(3.5 / 무난함)</span></> },
-                      { value: 3.0, label: <>{renderStars(3.0)} <span className="rating-desc">(3.0 / 평범함)</span></> },
-                      { value: 2.5, label: <>{renderStars(2.5)} <span className="rating-desc">(2.5 / 아쉬움)</span></> },
-                      { value: 2.0, label: <>{renderStars(2.0)} <span className="rating-desc">(2.0 / 아쉬움)</span></> },
-                      { value: 1.5, label: <>{renderStars(1.5)} <span className="rating-desc">(1.5 / 비추)</span></> },
-                      { value: 1.0, label: <>{renderStars(1.0)} <span className="rating-desc">(1.0 / 비추)</span></> },
-                      { value: 0.5, label: <>{renderStars(0.5)} <span className="rating-desc">(0.5 / 강력 비추)</span></> }
-                    ]}
-                  />
-                </div>
+              {/* 내 추천 별점 */}
+              <div className="form-group">
+                <label>내 추천 별점</label>
+                <RatingSelect
+                  value={editingRest.rating}
+                  onChange={(val) => setEditingRest({ ...editingRest, rating: parseFloat(val) })}
+                  options={[
+                    { value: 5.0, label: <>{renderStars(5.0)} <span className="rating-desc">(5.0 / 강력 추천)</span></> },
+                    { value: 4.5, label: <>{renderStars(4.5)} <span className="rating-desc">(4.5 / 추천)</span></> },
+                    { value: 4.0, label: <>{renderStars(4.0)} <span className="rating-desc">(4.0 / 추천)</span></> },
+                    { value: 3.5, label: <>{renderStars(3.5)} <span className="rating-desc">(3.5 / 무난함)</span></> },
+                    { value: 3.0, label: <>{renderStars(3.0)} <span className="rating-desc">(3.0 / 평범함)</span></> },
+                    { value: 2.5, label: <>{renderStars(2.5)} <span className="rating-desc">(2.5 / 아쉬움)</span></> },
+                    { value: 2.0, label: <>{renderStars(2.0)} <span className="rating-desc">(2.0 / 아쉬움)</span></> },
+                    { value: 1.5, label: <>{renderStars(1.5)} <span className="rating-desc">(1.5 / 비추)</span></> },
+                    { value: 1.0, label: <>{renderStars(1.0)} <span className="rating-desc">(1.0 / 비추)</span></> },
+                    { value: 0.5, label: <>{renderStars(0.5)} <span className="rating-desc">(0.5 / 강력 비추)</span></> }
+                  ]}
+                />
               </div>
 
               {/* 주소 (자동완성 선택 시 자동입력) */}
@@ -1577,26 +1564,6 @@ function App() {
                   value={editingRest.address}
                   onChange={(e) => setEditingRest({ ...editingRest, address: e.target.value })}
                 />
-              </div>
-
-              {/* 카카오맵 URL (자동완성 선택 시 자동입력) */}
-              <div className="form-group">
-                <label>카카오맵 링크 (자동입력)</label>
-                <input
-                  type="url"
-                  placeholder="상호명 자동완성 선택 시 자동 입력됩니다"
-                  value={editingRest.mapUrl}
-                  onChange={(e) => setEditingRest({ ...editingRest, mapUrl: e.target.value })}
-                />
-              </div>
-
-              {/* 미니 카카오맵 핀드롭 */}
-              <div className="form-group">
-                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
-                <div id="mini-map"></div>
-                <div className="mini-map-coord-display">
-                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
-                </div>
               </div>
 
               <div className="form-group">
@@ -1644,6 +1611,49 @@ function App() {
                       </button>
                     </div>
                   )}
+                </div>
+              </div>
+
+              <div className="divider" style={{ margin: '1.5rem 0', opacity: 0.5 }}></div>
+              <h3 style={{ fontSize: '0.92rem', color: 'var(--color-olive)', marginBottom: '1.25rem', fontWeight: 'bold' }}>ℹ️ 자동완성 연동 메타데이터 (수정 불필요)</h3>
+
+              {/* 지역 / 카테고리 - 자동완성 선택 시 자동입력됨 */}
+              <div className="row-fields">
+                <div className="form-group">
+                  <label>도시 구역 (자동)</label>
+                  <select value={editingRest.region} onChange={(e) => setEditingRest({ ...editingRest, region: e.target.value })}>
+                    {regions.filter(r => r.id !== 'all').map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>음식 종류 (자동)</label>
+                  <select value={editingRest.category} onChange={(e) => setEditingRest({ ...editingRest, category: e.target.value })}>
+                    {foodCategories.filter(c => c.id !== 'all').map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* 카카오맵 URL (자동완성 선택 시 자동입력) */}
+              <div className="form-group">
+                <label>카카오맵 링크 (자동입력)</label>
+                <input
+                  type="url"
+                  placeholder="상호명 자동완성 선택 시 자동 입력됩니다"
+                  value={editingRest.mapUrl}
+                  onChange={(e) => setEditingRest({ ...editingRest, mapUrl: e.target.value })}
+                />
+              </div>
+
+              {/* 미니 카카오맵 핀드롭 */}
+              <div className="form-group">
+                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
+                <div id="mini-map"></div>
+                <div className="mini-map-coord-display">
+                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
                 </div>
               </div>
 
