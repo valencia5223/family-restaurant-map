@@ -8,7 +8,7 @@ create table if not exists restaurants (
   member text not null,                      -- 추천 작성자 키 (papa, mama, daughter, makdung, husband)
   region text not null,                      -- 매핑된 행정 구역 (서울, 경기, 부산, 강원)
   category text not null,                    -- 음식 카테고리 (korean, western, asian, cafe)
-  rating integer not null,                   -- 추천 별점 (1~5)
+  rating numeric(3,1) not null,              -- 추천 별점 (0.5 단위, 0.5~5.0)
   recom_menu text default '대표 메뉴',        -- 대표 먹거리 (recomMenu)
   review text not null,                      -- 한줄평 후기
   tags text[] default '{}',                  -- 태그 명세 배열

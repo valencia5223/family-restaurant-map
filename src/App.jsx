@@ -45,6 +45,17 @@ function mapKakaoCategory(categoryGroupCode, categoryName) {
 }
 
 // ──────────────────────────────────────────────────
+// 별점 렌더링 헬퍼 (0.5 단위 지원)
+// ──────────────────────────────────────────────────
+function renderStars(ratingStr) {
+  const rating = parseFloat(ratingStr) || 0;
+  const fullStars = Math.floor(rating);
+  const hasHalf = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+  return '★'.repeat(fullStars) + (hasHalf ? '⯪' : '') + '☆'.repeat(emptyStars);
+}
+
+// ──────────────────────────────────────────────────
 // 메인 App 컴포넌트
 // ──────────────────────────────────────────────────
 function App() {
@@ -336,7 +347,7 @@ function App() {
     const container = document.getElementById('family-map');
     if (!container) return;
 
-    const options = { center: new window.kakao.maps.LatLng(36.3, 127.8), level: 11 };
+    const options = { center: new window.kakao.maps.LatLng(36.3, 127.8), level: 13 };
     const map = new window.kakao.maps.Map(container, options);
     mainMapRef.current = map;
     mainMarkersRef.current = [];
@@ -439,7 +450,7 @@ function App() {
       member: newRest.member,
       region: newRest.region,
       category: newRest.category,
-      rating: parseInt(newRest.rating, 10),
+      rating: parseFloat(newRest.rating),
       recom_menu: newRest.recomMenu.trim() || '전체 대표 메뉴',
       review: newRest.review.trim(),
       tags: cleanTags.length > 0 ? cleanTags : ['추천맛집'],
@@ -469,7 +480,7 @@ function App() {
 
       setRestaurants(prev => [...prev, clientObj]);
       setIsAddingNew(false);
-      setNewRest({ name: '', member: 'papa', region: '서울', category: 'korean', rating: 5, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: '' });
+      setNewRest({ name: '', member: 'papa', region: '서울', category: 'korean', rating: 5.0, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: '' });
       setFormLat(37.5665);
       setFormLng(126.9780);
     } catch (err) {
@@ -511,7 +522,7 @@ function App() {
       member: editingRest.member,
       region: editingRest.region,
       category: editingRest.category,
-      rating: parseInt(editingRest.rating, 10),
+      rating: parseFloat(editingRest.rating),
       recom_menu: editingRest.recomMenu.trim() || '전체 대표 메뉴',
       review: editingRest.review.trim(),
       tags: cleanTags.length > 0 ? cleanTags : ['추천맛집'],
@@ -662,11 +673,16 @@ function App() {
             <label>별점 선택</label>
             <select value={selectedRating} onChange={(e) => setSelectedRating(e.target.value)}>
               <option value="all">모든 별점 ⭐</option>
-              <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
-              <option value="4">⭐⭐⭐⭐ 이상</option>
-              <option value="3">⭐⭐⭐ 이상</option>
-              <option value="2">⭐⭐ 이상</option>
-              <option value="1">⭐ 이상</option>
+              <option value="5.0">⭐⭐⭐⭐⭐ (5.0점 전용)</option>
+              <option value="4.5">⭐⭐⭐⭐⯪ (4.5점 이상)</option>
+              <option value="4.0">⭐⭐⭐⭐ (4.0점 이상)</option>
+              <option value="3.5">⭐⭐⭐⯪ (3.5점 이상)</option>
+              <option value="3.0">⭐⭐⭐ (3.0점 이상)</option>
+              <option value="2.5">⭐⭐⯪ (2.5점 이상)</option>
+              <option value="2.0">⭐⭐ (2.0점 이상)</option>
+              <option value="1.5">⭐⯪ (1.5점 이상)</option>
+              <option value="1.0">⭐ (1.0점 이상)</option>
+              <option value="0.5">⯪ (0.5점 이상)</option>
             </select>
           </div>
         </div>
@@ -712,7 +728,7 @@ function App() {
                       <span>{memInfo.name} 추천</span>
                     </div>
                     <hr className="card-divider" />
-                    <div className="rating-row">{'★'.repeat(rest.rating)}{'☆'.repeat(5 - rest.rating)}</div>
+                    <div className="rating-row">{renderStars(rest.rating)}</div>
                     <p className="card-address-peek">📍 {rest.address || '주소 정보 없음'}</p>
                     <p className="card-peek-review">"{rest.review}"</p>
                     <div className="card-footer-links" onClick={(e) => e.stopPropagation()}>
@@ -808,7 +824,7 @@ function App() {
             <div className="modal-body">
               <div className="detail-row">
                 <span className="detail-label">🌟 가족 추천 단독 평점</span>
-                <div className="stars-holder">{'★'.repeat(selectedRestaurant.rating)}{'☆'.repeat(5 - selectedRestaurant.rating)}<span className="score-num">({selectedRestaurant.rating} / 5.0)</span></div>
+                <div className="stars-holder">{renderStars(selectedRestaurant.rating)}<span className="score-num">({parseFloat(selectedRestaurant.rating).toFixed(1)} / 5.0)</span></div>
               </div>
               <div className="detail-row">
                 <span className="detail-label">📍 식당 도로명 주소</span>
@@ -907,12 +923,17 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label>내 추천 별점</label>
-                  <select value={newRest.rating} onChange={(e) => setNewRest({ ...newRest, rating: e.target.value })}>
-                    <option value={5}>⭐⭐⭐⭐⭐ (강력 추천)</option>
-                    <option value={4}>⭐⭐⭐⭐ (추천)</option>
-                    <option value={3}>⭐⭐⭐ (평범함)</option>
-                    <option value={2}>⭐⭐ (아쉬움)</option>
-                    <option value={1}>⭐ (비추)</option>
+                  <select value={newRest.rating} onChange={(e) => setNewRest({ ...newRest, rating: parseFloat(e.target.value) })}>
+                    <option value={5.0}>⭐⭐⭐⭐⭐ (5.0 / 강력 추천)</option>
+                    <option value={4.5}>⭐⭐⭐⭐⯪ (4.5 / 추천)</option>
+                    <option value={4.0}>⭐⭐⭐⭐ (4.0 / 추천)</option>
+                    <option value={3.5}>⭐⭐⭐⯪ (3.5 / 무난함)</option>
+                    <option value={3.0}>⭐⭐⭐ (3.0 / 평범함)</option>
+                    <option value={2.5}>⭐⭐⯪ (2.5 / 아쉬움)</option>
+                    <option value={2.0}>⭐⭐ (2.0 / 아쉬움)</option>
+                    <option value={1.5}>⭐⯪ (1.5 / 비추)</option>
+                    <option value={1.0}>⭐ (1.0 / 비추)</option>
+                    <option value={0.5}>⯪ (0.5 / 강력 비추)</option>
                   </select>
                 </div>
               </div>
@@ -1042,12 +1063,17 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label>내 추천 별점</label>
-                  <select value={editingRest.rating} onChange={(e) => setEditingRest({ ...editingRest, rating: parseInt(e.target.value, 10) })}>
-                    <option value={5}>⭐⭐⭐⭐⭐ (강력 추천)</option>
-                    <option value={4}>⭐⭐⭐⭐ (추천)</option>
-                    <option value={3}>⭐⭐⭐ (평범함)</option>
-                    <option value={2}>⭐⭐ (아쉬움)</option>
-                    <option value={1}>⭐ (비추)</option>
+                  <select value={editingRest.rating} onChange={(e) => setEditingRest({ ...editingRest, rating: parseFloat(e.target.value) })}>
+                    <option value={5.0}>⭐⭐⭐⭐⭐ (5.0 / 강력 추천)</option>
+                    <option value={4.5}>⭐⭐⭐⭐⯪ (4.5 / 추천)</option>
+                    <option value={4.0}>⭐⭐⭐⭐ (4.0 / 추천)</option>
+                    <option value={3.5}>⭐⭐⭐⯪ (3.5 / 무난함)</option>
+                    <option value={3.0}>⭐⭐⭐ (3.0 / 평범함)</option>
+                    <option value={2.5}>⭐⭐⯪ (2.5 / 아쉬움)</option>
+                    <option value={2.0}>⭐⭐ (2.0 / 아쉬움)</option>
+                    <option value={1.5}>⭐⯪ (1.5 / 비추)</option>
+                    <option value={1.0}>⭐ (1.0 / 비추)</option>
+                    <option value={0.5}>⯪ (0.5 / 강력 비추)</option>
                   </select>
                 </div>
               </div>
