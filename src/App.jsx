@@ -102,7 +102,7 @@ function App() {
         
         if (error) throw error;
         
-        if (data && data.length > 0) {
+        if (data) {
           // camelCase 맵핑
           const clientData = data.map(r => ({
             id: r.id,
@@ -119,9 +119,6 @@ function App() {
             coords: r.coords || []
           }));
           setRestaurants(clientData);
-        } else {
-          // DB가 비어 있다면 기본값 이식
-          setRestaurants(defaultRestaurants);
         }
       } catch (err) {
         console.error('[Supabase 로드 오류] 로컬 샘플 가동:', err);
