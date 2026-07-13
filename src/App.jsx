@@ -468,7 +468,7 @@ function App() {
     return (
       <div className="profile-select-overlay">
         <div className="profile-select-container">
-          <h1 className="profile-select-title">누가 온 가족 맛지도를 열어볼까요?</h1>
+          <h1 className="profile-select-title">누구의 계정으로 로그인 하시겠습니까?</h1>
           <div className="profile-cards-container">
             {Object.entries(memberProfiles).map(([key, prof]) => (
               <div
