@@ -74,7 +74,9 @@ function renderStars(ratingStr) {
 // ──────────────────────────────────────────────────
 function RatingSelect({ value, onChange, options }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
   const containerRef = useRef(null);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -86,11 +88,25 @@ function RatingSelect({ value, onChange, options }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      // 아래 여백이 220px 미만이면 위로 전개
+      if (spaceBelow < 220) {
+        setOpenUpward(true);
+      } else {
+        setOpenUpward(false);
+      }
+    }
+  }, [isOpen]);
+
   const selectedOpt = options.find(opt => String(opt.value) === String(value)) || options[0];
 
   return (
     <div className="custom-select-container" ref={containerRef}>
       <div 
+        ref={triggerRef}
         className={`custom-select-trigger ${isOpen ? 'open-trigger' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         tabIndex="0"
@@ -107,7 +123,7 @@ function RatingSelect({ value, onChange, options }) {
         <span className={`custom-select-arrow ${isOpen ? 'rotated' : ''}`}>▼</span>
       </div>
       {isOpen && (
-        <div className="custom-select-options">
+        <div className={`custom-select-options ${openUpward ? 'open-upward' : ''}`}>
           {options.map((opt) => (
             <div
               key={opt.value}

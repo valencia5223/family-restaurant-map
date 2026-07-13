@@ -1905,3 +1905,10 @@ body {
     flex: 1 1 100%;
   }
 }
+
+/* ⬆️ 위쪽 방향으로 전개되는 커스텀 드롭다운 메뉴 스타일 */
+.custom-select-options.open-upward {
+  top: auto;
+  bottom: 108%;
+  box-shadow: 0 -8px 24px rgba(44, 38, 35, 0.12);
+}
