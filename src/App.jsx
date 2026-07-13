@@ -134,6 +134,7 @@ function App() {
   const [selectedMember, setSelectedMember] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedRating, setSelectedRating] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
 
@@ -146,6 +147,10 @@ function App() {
     name: '', member: 'papa', region: '서울', category: 'korean',
     rating: 5, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: ''
   });
+
+  // 맛집 수정 모달 제어 상태
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingRest, setEditingRest] = useState(null);
 
   // 자동완성 후보 리스트 상태
   const [nameSuggestions, setNameSuggestions] = useState([]);
@@ -190,21 +195,36 @@ function App() {
       const matchMember = selectedMember === 'all' || r.member === selectedMember;
       const matchRegion = selectedRegion === 'all' || r.region === selectedRegion;
       const matchCategory = selectedCategory === 'all' || r.category === selectedCategory;
+      
+      let matchRating = true;
+      if (selectedRating !== 'all') {
+        const ratingVal = parseInt(selectedRating, 10);
+        if (ratingVal === 5) {
+          matchRating = r.rating === 5;
+        } else {
+          matchRating = r.rating >= ratingVal;
+        }
+      }
+
       const text = searchTerm.toLowerCase();
       const matchSearch = r.name.toLowerCase().includes(text) ||
         r.recomMenu.toLowerCase().includes(text) ||
         (r.address && r.address.toLowerCase().includes(text)) ||
         r.review.toLowerCase().includes(text) ||
         r.tags.some(t => t.toLowerCase().includes(text));
-      return matchMember && matchRegion && matchCategory && matchSearch;
+      return matchMember && matchRegion && matchCategory && matchRating && matchSearch;
     });
-  }, [restaurants, selectedMember, selectedRegion, selectedCategory, searchTerm]);
+  }, [restaurants, selectedMember, selectedRegion, selectedCategory, selectedRating, searchTerm]);
 
   // ──────────────────────────────────────────────────
   // 4-A. 카카오 장소 검색 자동완성 (디바운스 300ms)
   // ──────────────────────────────────────────────────
   const handleNameInput = useCallback((value) => {
-    setNewRest(prev => ({ ...prev, name: value }));
+    if (isEditing) {
+      setEditingRest(prev => ({ ...prev, name: value }));
+    } else {
+      setNewRest(prev => ({ ...prev, name: value }));
+    }
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!value.trim() || value.length < 2) {
       setNameSuggestions([]);
@@ -229,7 +249,7 @@ function App() {
         }
       });
     }, 300);
-  }, [kakaoLoaded]);
+  }, [kakaoLoaded, isEditing]);
 
 
   // 자동완성 항목 선택 → 필드 자동채움
@@ -241,14 +261,20 @@ function App() {
     const category = mapKakaoCategory(place.category_group_code, place.category_name);
     const mapUrl = place.place_url || '';
 
-    setNewRest(prev => ({
+    const updater = (prev) => ({
       ...prev,
       name: place.place_name,
       address,
       mapUrl,
       region,
       category,
-    }));
+    });
+
+    if (isEditing) {
+      setEditingRest(updater);
+    } else {
+      setNewRest(updater);
+    }
     setFormLat(lat);
     setFormLng(lng);
     setNameSuggestions([]);
@@ -260,7 +286,7 @@ function App() {
       miniMarkerRef.current.setPosition(moveLatLng);
       miniMapRef.current.setCenter(moveLatLng);
     }
-  }, []);
+  }, [isEditing]);
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -350,7 +376,7 @@ function App() {
   };
 
   useEffect(() => {
-    if (!isAddingNew) {
+    if (!isAddingNew && !isEditing) {
       miniMapRef.current = null;
       miniMarkerRef.current = null;
       return;
@@ -383,7 +409,7 @@ function App() {
       setFormLat(parseFloat(pos.getLat().toFixed(6)));
       setFormLng(parseFloat(pos.getLng().toFixed(6)));
     });
-  }, [isAddingNew]);
+  }, [isAddingNew, isEditing]);
 
   // ──────────────────────────────────────────────────
   // 7. 새 맛집 등록 저장
@@ -437,6 +463,82 @@ function App() {
     } catch (err) {
       console.error('[등록 오류]', err);
       alert('데이터베이스 저장 중 오류가 발생했습니다: ' + err.message);
+    }
+  };
+
+  const handleEditClick = (rest) => {
+    setSelectedRestaurant(null);
+    setEditingRest({
+      id: rest.id,
+      name: rest.name,
+      member: rest.member,
+      region: rest.region,
+      category: rest.category,
+      rating: rest.rating,
+      recomMenu: rest.recomMenu,
+      review: rest.review,
+      tagsInput: rest.tags.join(', '),
+      address: rest.address,
+      mapUrl: rest.mapUrl || '',
+      coords: rest.coords || [37.5665, 126.9780]
+    });
+    setFormLat(rest.coords?.[0] || 37.5665);
+    setFormLng(rest.coords?.[1] || 126.9780);
+    setIsEditing(true);
+  };
+
+  const updateRecommendation = async (e) => {
+    e.preventDefault();
+    if (!editingRest.name.trim()) return alert('식당 이름을 적어주세요.');
+    if (!editingRest.review.trim()) return alert('식당 후기를 적어주세요.');
+
+    const cleanTags = editingRest.tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
+
+    const dbObj = {
+      name: editingRest.name.trim(),
+      member: editingRest.member,
+      region: editingRest.region,
+      category: editingRest.category,
+      rating: parseInt(editingRest.rating, 10),
+      recom_menu: editingRest.recomMenu.trim() || '전체 대표 메뉴',
+      review: editingRest.review.trim(),
+      tags: cleanTags.length > 0 ? cleanTags : ['추천맛집'],
+      address: editingRest.address.trim() || '주소 정보 없음',
+      map_url: editingRest.mapUrl.trim() || null,
+      coords: [formLat, formLng]
+    };
+
+    try {
+      const { error } = await supabase
+        .from('restaurants')
+        .update(dbObj)
+        .eq('id', editingRest.id);
+      
+      if (error) throw error;
+
+      const clientObj = {
+        id: editingRest.id,
+        name: dbObj.name,
+        member: dbObj.member,
+        region: dbObj.region,
+        category: dbObj.category,
+        rating: dbObj.rating,
+        recomMenu: dbObj.recom_menu,
+        review: dbObj.review,
+        tags: dbObj.tags,
+        address: dbObj.address,
+        mapUrl: dbObj.map_url,
+        coords: dbObj.coords
+      };
+
+      setRestaurants(prev => prev.map(r => r.id === editingRest.id ? clientObj : r));
+      setIsEditing(false);
+      setEditingRest(null);
+      setFormLat(37.5665);
+      setFormLng(126.9780);
+    } catch (err) {
+      console.error('[수정 오류]', err);
+      alert('데이터베이스 수정 중 오류가 발생했습니다: ' + err.message);
     }
   };
 
@@ -544,6 +646,17 @@ function App() {
               {foodCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
+          <div className="filter-group">
+            <label>별점 선택</label>
+            <select value={selectedRating} onChange={(e) => setSelectedRating(e.target.value)}>
+              <option value="all">모든 별점 ⭐</option>
+              <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
+              <option value="4">⭐⭐⭐⭐ 이상</option>
+              <option value="3">⭐⭐⭐ 이상</option>
+              <option value="2">⭐⭐ 이상</option>
+              <option value="1">⭐ 이상</option>
+            </select>
+          </div>
         </div>
       </section>
 
@@ -600,7 +713,6 @@ function App() {
                     <div className="card-tags">
                       {rest.tags.map((t, idx) => <span key={idx} className="tag-pill">#{t}</span>)}
                     </div>
-                    <button className="card-delete-btn" onClick={(e) => deleteRecommendation(rest.id, e)} title="맛집 삭제">🗑️</button>
                   </div>
                 );
               })}
@@ -660,9 +772,55 @@ function App() {
                 <span className="detail-label">💬 생생 검증 한줄평</span>
                 <p className="detailed-review">"{selectedRestaurant.review}"</p>
               </div>
-              <div className="detail-row border-none">
-                <span className="detail-label">🏷️ 추천 포인트 태그</span>
-                <div className="detail-tags">{selectedRestaurant.tags.map((t, idx) => <span key={idx} className="tag-item">#{t}</span>)}</div>
+              <div className="detail-row border-none" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <span className="detail-label">🏷️ 추천 포인트 태그</span>
+                  <div className="detail-tags">{selectedRestaurant.tags.map((t, idx) => <span key={idx} className="tag-item">#{t}</span>)}</div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.6rem' }}>
+                  <button 
+                    className="edit-recommendation-btn" 
+                    onClick={() => handleEditClick(selectedRestaurant)}
+                    style={{
+                      backgroundColor: 'var(--color-olive)',
+                      color: 'white',
+                      border: 'none',
+                      fontFamily: 'var(--font-base)',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      padding: '0.6rem 1.2rem',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      boxShadow: '0 4px 10px rgba(91, 107, 93, 0.15)'
+                    }}
+                    onMouseOver={(e) => e.target.style.filter = 'brightness(1.1)'}
+                    onMouseOut={(e) => e.target.style.filter = 'none'}
+                  >
+                    ✍️ 수정하기
+                  </button>
+                  <button 
+                    className="delete-recommendation-btn" 
+                    onClick={(e) => deleteRecommendation(selectedRestaurant.id, e)}
+                    style={{
+                      backgroundColor: '#e05c36',
+                      color: 'white',
+                      border: 'none',
+                      fontFamily: 'var(--font-base)',
+                      fontWeight: 700,
+                      fontSize: '0.85rem',
+                      padding: '0.6rem 1.2rem',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      boxShadow: '0 4px 10px rgba(224, 92, 54, 0.15)'
+                    }}
+                    onMouseOver={(e) => e.target.style.filter = 'brightness(1.1)'}
+                    onMouseOut={(e) => e.target.style.filter = 'none'}
+                  >
+                    🗑️ 삭제하기
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -798,6 +956,141 @@ function App() {
               <div className="form-actions">
                 <button type="button" className="cancel-act-btn" onClick={() => setIsAddingNew(false)}>취소</button>
                 <button type="submit" className="submit-act-btn">가족 지도형 보관소에 제출</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 맛집 수정 모달 */}
+      {isEditing && editingRest && (
+        <div className="modal-overlay" onClick={() => { setIsEditing(false); setEditingRest(null); }}>
+          <div className="modal-content b-add-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => { setIsEditing(false); setEditingRest(null); }}>×</button>
+            <h2>✍️ 맛집 추천서 수정</h2>
+            <p className="form-helper">상호명이나 정보를 수정한 후 저장해 주세요 🗺️</p>
+
+            <form onSubmit={updateRecommendation}>
+              {/* 식당명 + 자동완성 */}
+              <div className="row-fields">
+                <div className="form-group" style={{ position: 'relative' }} ref={suggestionsRef}>
+                  <label>식당 명칭 (자동완성 추천)</label>
+                  <input
+                    type="text"
+                    placeholder="예: 스타벅스 홍대점, 영진돼지국밥"
+                    value={editingRest.name}
+                    onChange={(e) => handleNameInput(e.target.value)}
+                    autoComplete="off"
+                    required
+                  />
+                  {/* 자동완성 드롭다운 */}
+                  {showSuggestions && nameSuggestions.length > 0 && (
+                    <ul className="autocomplete-list">
+                      {nameSuggestions.map((place) => (
+                        <li
+                          key={place.id}
+                          className="autocomplete-item"
+                          onMouseDown={() => handleSuggestionSelect(place)}
+                        >
+                          <span className="autocomplete-name">{place.place_name}</span>
+                          <span className="autocomplete-addr">{place.road_address_name || place.address_name}</span>
+                          <span className="autocomplete-cat">{place.category_name?.split(' > ').pop()}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="form-group">
+                  <label>추천 작성자</label>
+                  <select value={editingRest.member} onChange={(e) => setEditingRest({ ...editingRest, member: e.target.value })}>
+                    <option value="papa">아빠 👨‍💼</option>
+                    <option value="mama">엄마 👩‍🍳</option>
+                    <option value="daughter">큰딸 🙋‍♀️</option>
+                    <option value="makdung">작은딸 👧</option>
+                    <option value="husband">사위 🙋‍♂️</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* 지역 / 카테고리 / 별점 - 자동완성 선택 시 자동입력됨 */}
+              <div className="row-fields select-three">
+                <div className="form-group">
+                  <label>도시 구역 (자동)</label>
+                  <select value={editingRest.region} onChange={(e) => setEditingRest({ ...editingRest, region: e.target.value })}>
+                    {regions.filter(r => r.id !== 'all').map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>음식 종류 (자동)</label>
+                  <select value={editingRest.category} onChange={(e) => setEditingRest({ ...editingRest, category: e.target.value })}>
+                    {foodCategories.filter(c => c.id !== 'all').map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>내 추천 별점</label>
+                  <select value={editingRest.rating} onChange={(e) => setEditingRest({ ...editingRest, rating: parseInt(e.target.value, 10) })}>
+                    <option value={5}>⭐⭐⭐⭐⭐ (강력 추천)</option>
+                    <option value={4}>⭐⭐⭐⭐ (추천)</option>
+                    <option value={3}>⭐⭐⭐ (평범함)</option>
+                    <option value={2}>⭐⭐ (아쉬움)</option>
+                    <option value={1}>⭐ (비추)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* 주소 (자동완성 선택 시 자동입력) */}
+              <div className="form-group">
+                <label>업체 도로명 / 지번 주소 (자동입력)</label>
+                <input
+                  type="text"
+                  placeholder="상호명 자동완성 선택 시 자동 입력됩니다"
+                  value={editingRest.address}
+                  onChange={(e) => setEditingRest({ ...editingRest, address: e.target.value })}
+                />
+              </div>
+
+              {/* 카카오맵 URL (자동완성 선택 시 자동입력) */}
+              <div className="form-group">
+                <label>카카오맵 링크 (자동입력)</label>
+                <input
+                  type="url"
+                  placeholder="상호명 자동완성 선택 시 자동 입력됩니다"
+                  value={editingRest.mapUrl}
+                  onChange={(e) => setEditingRest({ ...editingRest, mapUrl: e.target.value })}
+                />
+              </div>
+
+              {/* 미니 카카오맵 핀드롭 */}
+              <div className="form-group">
+                <label>📍 카카오맵 위치 핀 (자동완성 선택 시 자동이동 · 직접 클릭/드래그 가능)</label>
+                <div id="mini-map"></div>
+                <div className="mini-map-coord-display">
+                  선택 좌표: 위도 <strong>{formLat}</strong>, 경도 <strong>{formLng}</strong>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>이 식당의 꼭 먹어야 마땅할 요리</label>
+                <input type="text" placeholder="예: 수육백반, 순대국밥" value={editingRest.recomMenu} onChange={(e) => setEditingRest({ ...editingRest, recomMenu: e.target.value })} />
+              </div>
+
+              <div className="form-group">
+                <label>조언 섞인 한줄평 (필수)</label>
+                <textarea placeholder="추천 이유, 팁, 주차 정보 등을 자유롭게 작성하세요." rows={3} value={editingRest.review} onChange={(e) => setEditingRest({ ...editingRest, review: e.target.value })} required />
+              </div>
+
+              <div className="form-group">
+                <label>추천 성향 키워드 (쉼표로 구분)</label>
+                <input type="text" placeholder="예: 주차편리, 웨이팅숨참, 노포맛집, 오션뷰" value={editingRest.tagsInput} onChange={(e) => setEditingRest({ ...editingRest, tagsInput: e.target.value })} />
+              </div>
+
+              <div className="form-actions">
+                <button type="button" className="cancel-act-btn" onClick={() => { setIsEditing(false); setEditingRest(null); }}>취소</button>
+                <button type="submit" className="submit-act-btn">수정 완료</button>
               </div>
             </form>
           </div>
