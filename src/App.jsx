@@ -336,7 +336,7 @@ function App() {
     const container = document.getElementById('family-map');
     if (!container) return;
 
-    const options = { center: new window.kakao.maps.LatLng(36.3, 127.8), level: 9 };
+    const options = { center: new window.kakao.maps.LatLng(36.3, 127.8), level: 11 };
     const map = new window.kakao.maps.Map(container, options);
     mainMapRef.current = map;
     mainMarkersRef.current = [];
