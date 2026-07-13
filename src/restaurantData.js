@@ -8,11 +8,16 @@ export const members = {
 };
 
 export const regions = [
-  { id: 'all', name: '전국 맛지도🗺️' },
+  { id: 'all', name: '전국 맛지도 🗺️' },
   { id: '서울', name: '서울 🗼' },
-  { id: '경기', name: '경기/인천 🌳' },
-  { id: '부산', name: '부산/경상 🌊' },
-  { id: '강원', name: '강원/기타 🏔️' }
+  { id: '경기/인천', name: '경기/인천 🌳' },
+  { id: '부산/울산/경남', name: '부산/울산/경남 🌊' },
+  { id: '대구/경북', name: '대구/경북 🌾' },
+  { id: '전북', name: '전북 🥬' },
+  { id: '전남/광주', name: '전남/광주 🍲' },
+  { id: '강원', name: '강원 🏔️' },
+  { id: '충청/세종/대전', name: '충청/세종/대전 🍊' },
+  { id: '제주', name: '제주 🌴' }
 ];
 
 export const foodCategories = [
@@ -42,7 +47,7 @@ export const defaultRestaurants = [
     id: 2,
     name: "초록뜰 우렁 쌈밥정식",
     member: "mama",
-    region: "경기",
+    region: "경기/인천",
     category: "korean",
     rating: 5,
     recomMenu: "제육 쌈밥 정식, 우렁 더덕구이",
@@ -70,7 +75,7 @@ export const defaultRestaurants = [
     id: 4,
     name: "달콤 푸딩 '오아시스 카페'",
     member: "daughter",
-    region: "부산",
+    region: "부산/울산/경남",
     category: "cafe",
     rating: 4,
     recomMenu: "일본식 수제 커스터드 푸딩, 아인슈페너",

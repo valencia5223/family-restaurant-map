@@ -1231,19 +1231,20 @@ body {
 }
 
 .header-profile-btn {
-  background: var(--color-rust) !important; /* 색상이 반투명 속에 가리던 현상 차단 */
+  background: #d84b2c !important; /* 변수 유실 등에 상관없이 무조건 뚜렷하게 발색되는 주황 다홍색 헥사코드 강제 적용 */
   color: #ffffff !important;
-  border: none;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.25rem 0.6rem;
-  border-radius: 20px;
-  cursor: pointer;
-  opacity: 1 !important; /* 마우스 호버 전에도 선명하게 100% 노출 강제 */
+  border: 1px solid rgba(0,0,0,0.05) !important;
+  font-size: 0.78rem !important; /* 글씨 크기 확장 */
+  font-weight: 800 !important; /* 글씨 굵기 보정 */
+  padding: 0.35rem 0.75rem !important; /* 패딩 확장으로 버튼 클릭 편리성 극대화 */
+  border-radius: 20px !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
   visibility: visible !important;
   display: inline-block !important;
-  transition: background 0.2s ease, transform 0.1s ease;
-  box-shadow: 0 2px 5px rgba(224, 86, 36, 0.3);
+  margin-left: 0.5rem !important;
+  transition: background 0.2s ease, transform 0.1s ease !important;
+  box-shadow: 0 2px 6px rgba(216, 75, 44, 0.35) !important;
 }
 
 .header-profile-btn:hover {
