@@ -178,6 +178,7 @@ function App() {
   const miniMapRef = useRef(null);
   const miniMarkerRef = useRef(null);
   const mainMarkersRef = useRef([]);
+  const mouseDownOverlayStarted = useRef(false);
 
   // ──────────────────────────────────────────────────
   // 2. 대시보드 통계 계산
@@ -209,11 +210,11 @@ function App() {
       
       let matchRating = true;
       if (selectedRating !== 'all') {
-        const ratingVal = parseInt(selectedRating, 10);
-        if (ratingVal === 5) {
-          matchRating = r.rating === 5;
+        const ratingVal = parseFloat(selectedRating);
+        if (ratingVal >= 5.0) {
+          matchRating = parseFloat(r.rating) >= 5.0;
         } else {
-          matchRating = r.rating >= ratingVal;
+          matchRating = parseFloat(r.rating) >= ratingVal;
         }
       }
 
@@ -765,8 +766,22 @@ function App() {
 
       {/* 상세 정보 모달 */}
       {selectedRestaurant && (
-        <div className="modal-overlay" onClick={() => setSelectedRestaurant(null)}>
-          <div className="modal-content b-detail-modal" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="modal-overlay" 
+          onMouseDown={(e) => { if(e.target === e.currentTarget) mouseDownOverlayStarted.current = true; }}
+          onMouseUp={(e) => {
+            if (e.target === e.currentTarget && mouseDownOverlayStarted.current) {
+              setSelectedRestaurant(null);
+            }
+            mouseDownOverlayStarted.current = false;
+          }}
+        >
+          <div 
+            className="modal-content b-detail-modal" 
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseUp={(e) => e.stopPropagation()}
+          >
             <button className="modal-close-btn" onClick={() => setSelectedRestaurant(null)}>×</button>
             <div className="modal-top-actions" style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem', paddingRight: '2rem' }}>
               <button 
@@ -855,8 +870,22 @@ function App() {
 
       {/* 새 맛집 등록 모달 */}
       {isAddingNew && (
-        <div className="modal-overlay" onClick={() => setIsAddingNew(false)}>
-          <div className="modal-content b-add-modal" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="modal-overlay" 
+          onMouseDown={(e) => { if(e.target === e.currentTarget) mouseDownOverlayStarted.current = true; }}
+          onMouseUp={(e) => {
+            if (e.target === e.currentTarget && mouseDownOverlayStarted.current) {
+              setIsAddingNew(false);
+            }
+            mouseDownOverlayStarted.current = false;
+          }}
+        >
+          <div 
+            className="modal-content b-add-modal" 
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseUp={(e) => e.stopPropagation()}
+          >
             <button className="modal-close-btn" onClick={() => setIsAddingNew(false)}>×</button>
             <h2>✍️ 신규 가족 맛집 추천서 작성</h2>
             <p className="form-helper">상호명을 입력하면 카카오맵에서 자동으로 주소와 지도 링크를 찾아드립니다 🗺️</p>
@@ -995,8 +1024,23 @@ function App() {
 
       {/* 맛집 수정 모달 */}
       {isEditing && editingRest && (
-        <div className="modal-overlay" onClick={() => { setIsEditing(false); setEditingRest(null); }}>
-          <div className="modal-content b-add-modal" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="modal-overlay" 
+          onMouseDown={(e) => { if(e.target === e.currentTarget) mouseDownOverlayStarted.current = true; }}
+          onMouseUp={(e) => {
+            if (e.target === e.currentTarget && mouseDownOverlayStarted.current) {
+              setIsEditing(false);
+              setEditingRest(null);
+            }
+            mouseDownOverlayStarted.current = false;
+          }}
+        >
+          <div 
+            className="modal-content b-add-modal" 
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseUp={(e) => e.stopPropagation()}
+          >
             <button className="modal-close-btn" onClick={() => { setIsEditing(false); setEditingRest(null); }}>×</button>
             <h2>✍️ 맛집 추천서 수정</h2>
             <p className="form-helper">상호명이나 정보를 수정한 후 저장해 주세요 🗺️</p>
