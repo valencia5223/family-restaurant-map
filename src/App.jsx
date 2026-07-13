@@ -299,6 +299,18 @@ function App() {
     return () => document.removeEventListener('mousedown', handleOutside);
   }, []);
 
+  // 모달 오픈 시 뒷배경 스크롤 방지 효과
+  useEffect(() => {
+    if (isAddingNew || isEditing || selectedRestaurant) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isAddingNew, isEditing, selectedRestaurant]);
+
   // ──────────────────────────────────────────────────
   // 4-B. 외부 지도 팝업에서 상세보기 인터페이스
   // ──────────────────────────────────────────────────
@@ -740,6 +752,50 @@ function App() {
         <div className="modal-overlay" onClick={() => setSelectedRestaurant(null)}>
           <div className="modal-content b-detail-modal" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={() => setSelectedRestaurant(null)}>×</button>
+            <div className="modal-top-actions" style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem', paddingRight: '2rem' }}>
+              <button 
+                className="edit-recommendation-btn" 
+                onClick={() => handleEditClick(selectedRestaurant)}
+                style={{
+                  backgroundColor: 'var(--color-olive)',
+                  color: 'white',
+                  border: 'none',
+                  fontFamily: 'var(--font-base)',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 2px 6px rgba(91, 107, 93, 0.15)'
+                }}
+                onMouseOver={(e) => e.target.style.filter = 'brightness(1.1)'}
+                onMouseOut={(e) => e.target.style.filter = 'none'}
+              >
+                ✍️ 수정하기
+              </button>
+              <button 
+                className="delete-recommendation-btn" 
+                onClick={(e) => deleteRecommendation(selectedRestaurant.id, e)}
+                style={{
+                  backgroundColor: '#e05c36',
+                  color: 'white',
+                  border: 'none',
+                  fontFamily: 'var(--font-base)',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 2px 6px rgba(224, 92, 54, 0.15)'
+                }}
+                onMouseOver={(e) => e.target.style.filter = 'brightness(1.1)'}
+                onMouseOut={(e) => e.target.style.filter = 'none'}
+              >
+                🗑️ 삭제하기
+              </button>
+            </div>
             <div className="modal-head">
               <span className="modal-region">{selectedRestaurant.region}</span>
               <h2>{selectedRestaurant.name}</h2>
@@ -772,55 +828,9 @@ function App() {
                 <span className="detail-label">💬 생생 검증 한줄평</span>
                 <p className="detailed-review">"{selectedRestaurant.review}"</p>
               </div>
-              <div className="detail-row border-none" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                <div>
-                  <span className="detail-label">🏷️ 추천 포인트 태그</span>
-                  <div className="detail-tags">{selectedRestaurant.tags.map((t, idx) => <span key={idx} className="tag-item">#{t}</span>)}</div>
-                </div>
-                <div style={{ display: 'flex', gap: '0.6rem' }}>
-                  <button 
-                    className="edit-recommendation-btn" 
-                    onClick={() => handleEditClick(selectedRestaurant)}
-                    style={{
-                      backgroundColor: 'var(--color-olive)',
-                      color: 'white',
-                      border: 'none',
-                      fontFamily: 'var(--font-base)',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      padding: '0.6rem 1.2rem',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      boxShadow: '0 4px 10px rgba(91, 107, 93, 0.15)'
-                    }}
-                    onMouseOver={(e) => e.target.style.filter = 'brightness(1.1)'}
-                    onMouseOut={(e) => e.target.style.filter = 'none'}
-                  >
-                    ✍️ 수정하기
-                  </button>
-                  <button 
-                    className="delete-recommendation-btn" 
-                    onClick={(e) => deleteRecommendation(selectedRestaurant.id, e)}
-                    style={{
-                      backgroundColor: '#e05c36',
-                      color: 'white',
-                      border: 'none',
-                      fontFamily: 'var(--font-base)',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
-                      padding: '0.6rem 1.2rem',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      boxShadow: '0 4px 10px rgba(224, 92, 54, 0.15)'
-                    }}
-                    onMouseOver={(e) => e.target.style.filter = 'brightness(1.1)'}
-                    onMouseOut={(e) => e.target.style.filter = 'none'}
-                  >
-                    🗑️ 삭제하기
-                  </button>
-                </div>
+              <div className="detail-row border-none">
+                <span className="detail-label">🏷️ 추천 포인트 태그</span>
+                <div className="detail-tags">{selectedRestaurant.tags.map((t, idx) => <span key={idx} className="tag-item">#{t}</span>)}</div>
               </div>
             </div>
           </div>
