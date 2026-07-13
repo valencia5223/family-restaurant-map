@@ -1812,6 +1812,7 @@ body {
   color: var(--color-charcoal);
   transition: border-color 0.2s, box-shadow 0.2s;
   user-select: none;
+  overflow: hidden; /* 가로 넘침 방지 */
 }
 
 .custom-select-trigger:focus,
@@ -1824,6 +1825,22 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: calc(100% - 15px); /* 화살표 여유 가로폭 확보 */
+  overflow: hidden;
+}
+
+.custom-select-trigger-label span {
+  flex-shrink: 0; /* 별 도형 고정 */
+}
+
+.rating-desc {
+  margin-left: 4px;
+  font-size: 0.78rem;
+  color: #888;
+  flex-shrink: 1; /* 너비 부족 시 글자 축소 생략 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .custom-select-arrow {

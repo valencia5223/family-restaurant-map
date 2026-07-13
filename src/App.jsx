@@ -899,16 +899,16 @@ function App() {
               onChange={setSelectedRating}
               options={[
                 { value: 'all', label: <>모든 별점 ⭐</> },
-                { value: '5.0', label: <>{renderStars(5.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(5.0점 전용)</span></> },
-                { value: '4.5', label: <>{renderStars(4.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.5점 이상)</span></> },
-                { value: '4.0', label: <>{renderStars(4.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.0점 이상)</span></> },
-                { value: '3.5', label: <>{renderStars(3.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.5점 이상)</span></> },
-                { value: '3.0', label: <>{renderStars(3.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.0점 이상)</span></> },
-                { value: '2.5', label: <>{renderStars(2.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.5점 이상)</span></> },
-                { value: '2.0', label: <>{renderStars(2.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.0점 이상)</span></> },
-                { value: '1.5', label: <>{renderStars(1.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.5점 이상)</span></> },
-                { value: '1.0', label: <>{renderStars(1.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.0점 이상)</span></> },
-                { value: '0.5', label: <>{renderStars(0.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(0.5점 이상)</span></> }
+                { value: '5.0', label: <>{renderStars(5.0)} <span className="rating-desc">(5.0점 전용)</span></> },
+                { value: '4.5', label: <>{renderStars(4.5)} <span className="rating-desc">(4.5점 이상)</span></> },
+                { value: '4.0', label: <>{renderStars(4.0)} <span className="rating-desc">(4.0점 이상)</span></> },
+                { value: '3.5', label: <>{renderStars(3.5)} <span className="rating-desc">(3.5점 이상)</span></> },
+                { value: '3.0', label: <>{renderStars(3.0)} <span className="rating-desc">(3.0점 이상)</span></> },
+                { value: '2.5', label: <>{renderStars(2.5)} <span className="rating-desc">(2.5점 이상)</span></> },
+                { value: '2.0', label: <>{renderStars(2.0)} <span className="rating-desc">(2.0점 이상)</span></> },
+                { value: '1.5', label: <>{renderStars(1.5)} <span className="rating-desc">(1.5점 이상)</span></> },
+                { value: '1.0', label: <>{renderStars(1.0)} <span className="rating-desc">(1.0점 이상)</span></> },
+                { value: '0.5', label: <>{renderStars(0.5)} <span className="rating-desc">(0.5점 이상)</span></> }
               ]}
             />
           </div>
@@ -1360,16 +1360,16 @@ function App() {
                     value={newRest.rating}
                     onChange={(val) => setNewRest({ ...newRest, rating: parseFloat(val) })}
                     options={[
-                      { value: 5.0, label: <>{renderStars(5.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(5.0 / 강력 추천)</span></> },
-                      { value: 4.5, label: <>{renderStars(4.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.5 / 추천)</span></> },
-                      { value: 4.0, label: <>{renderStars(4.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.0 / 추천)</span></> },
-                      { value: 3.5, label: <>{renderStars(3.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.5 / 무난함)</span></> },
-                      { value: 3.0, label: <>{renderStars(3.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.0 / 평범함)</span></> },
-                      { value: 2.5, label: <>{renderStars(2.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.5 / 아쉬움)</span></> },
-                      { value: 2.0, label: <>{renderStars(2.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.0 / 아쉬움)</span></> },
-                      { value: 1.5, label: <>{renderStars(1.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.5 / 비추)</span></> },
-                      { value: 1.0, label: <>{renderStars(1.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.0 / 비추)</span></> },
-                      { value: 0.5, label: <>{renderStars(0.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(0.5 / 강력 비추)</span></> }
+                      { value: 5.0, label: <>{renderStars(5.0)} <span className="rating-desc">(5.0 / 강력 추천)</span></> },
+                      { value: 4.5, label: <>{renderStars(4.5)} <span className="rating-desc">(4.5 / 추천)</span></> },
+                      { value: 4.0, label: <>{renderStars(4.0)} <span className="rating-desc">(4.0 / 추천)</span></> },
+                      { value: 3.5, label: <>{renderStars(3.5)} <span className="rating-desc">(3.5 / 무난함)</span></> },
+                      { value: 3.0, label: <>{renderStars(3.0)} <span className="rating-desc">(3.0 / 평범함)</span></> },
+                      { value: 2.5, label: <>{renderStars(2.5)} <span className="rating-desc">(2.5 / 아쉬움)</span></> },
+                      { value: 2.0, label: <>{renderStars(2.0)} <span className="rating-desc">(2.0 / 아쉬움)</span></> },
+                      { value: 1.5, label: <>{renderStars(1.5)} <span className="rating-desc">(1.5 / 비추)</span></> },
+                      { value: 1.0, label: <>{renderStars(1.0)} <span className="rating-desc">(1.0 / 비추)</span></> },
+                      { value: 0.5, label: <>{renderStars(0.5)} <span className="rating-desc">(0.5 / 강력 비추)</span></> }
                     ]}
                   />
                 </div>
@@ -1553,16 +1553,16 @@ function App() {
                     value={editingRest.rating}
                     onChange={(val) => setEditingRest({ ...editingRest, rating: parseFloat(val) })}
                     options={[
-                      { value: 5.0, label: <>{renderStars(5.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(5.0 / 강력 추천)</span></> },
-                      { value: 4.5, label: <>{renderStars(4.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.5 / 추천)</span></> },
-                      { value: 4.0, label: <>{renderStars(4.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.0 / 추천)</span></> },
-                      { value: 3.5, label: <>{renderStars(3.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.5 / 무난함)</span></> },
-                      { value: 3.0, label: <>{renderStars(3.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.0 / 평범함)</span></> },
-                      { value: 2.5, label: <>{renderStars(2.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.5 / 아쉬움)</span></> },
-                      { value: 2.0, label: <>{renderStars(2.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.0 / 아쉬움)</span></> },
-                      { value: 1.5, label: <>{renderStars(1.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.5 / 비추)</span></> },
-                      { value: 1.0, label: <>{renderStars(1.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.0 / 비추)</span></> },
-                      { value: 0.5, label: <>{renderStars(0.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(0.5 / 강력 비추)</span></> }
+                      { value: 5.0, label: <>{renderStars(5.0)} <span className="rating-desc">(5.0 / 강력 추천)</span></> },
+                      { value: 4.5, label: <>{renderStars(4.5)} <span className="rating-desc">(4.5 / 추천)</span></> },
+                      { value: 4.0, label: <>{renderStars(4.0)} <span className="rating-desc">(4.0 / 추천)</span></> },
+                      { value: 3.5, label: <>{renderStars(3.5)} <span className="rating-desc">(3.5 / 무난함)</span></> },
+                      { value: 3.0, label: <>{renderStars(3.0)} <span className="rating-desc">(3.0 / 평범함)</span></> },
+                      { value: 2.5, label: <>{renderStars(2.5)} <span className="rating-desc">(2.5 / 아쉬움)</span></> },
+                      { value: 2.0, label: <>{renderStars(2.0)} <span className="rating-desc">(2.0 / 아쉬움)</span></> },
+                      { value: 1.5, label: <>{renderStars(1.5)} <span className="rating-desc">(1.5 / 비추)</span></> },
+                      { value: 1.0, label: <>{renderStars(1.0)} <span className="rating-desc">(1.0 / 비추)</span></> },
+                      { value: 0.5, label: <>{renderStars(0.5)} <span className="rating-desc">(0.5 / 강력 비추)</span></> }
                     ]}
                   />
                 </div>
