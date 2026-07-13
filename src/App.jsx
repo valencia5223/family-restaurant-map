@@ -56,6 +56,42 @@ function renderStars(ratingStr) {
   return '★'.repeat(fullStars) + (hasHalf ? '⯪' : '') + '☆'.repeat(emptyStars);
 }
 
+// 🖼️ 모바일 브라우저 친화형 이미지 리사이저 및 압축기 (동일 스펙 맞춤형 용량 감소화)
+const resizeImage = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 600; // 최대 가로세로 600px 종횡비 맞춤
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        // JPEG 60% 압축으로 base64 변환
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => reject(err);
+      img.src = e.target.result;
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+};
+
 // ──────────────────────────────────────────────────
 // 메인 App 컴포넌트
 // ──────────────────────────────────────────────────
@@ -116,20 +152,26 @@ function App() {
         
         if (data) {
           // camelCase 맵핑
-          const clientData = data.map(r => ({
-            id: r.id,
-            name: r.name,
-            member: r.member,
-            region: r.region,
-            category: r.category,
-            rating: r.rating,
-            recomMenu: r.recom_menu || r.recomMenu || '전체 대표 메뉴',
-            review: r.review,
-            tags: r.tags || [],
-            address: r.address || '주소 정보 없음',
-            mapUrl: r.map_url || r.mapUrl || null,
-            coords: r.coords || []
-          }));
+          const clientData = data.map(r => {
+            const rawTags = r.tags || [];
+            const photoUrl = rawTags.find(t => t.startsWith('img:'))?.substring(4) || null;
+            const cleanTags = rawTags.filter(t => !t.startsWith('img:'));
+            return {
+              id: r.id,
+              name: r.name,
+              member: r.member,
+              region: r.region,
+              category: r.category,
+              rating: r.rating,
+              recomMenu: r.recom_menu || r.recomMenu || '전체 대표 메뉴',
+              review: r.review,
+              tags: cleanTags,
+              photo: photoUrl,
+              address: r.address || '주소 정보 없음',
+              mapUrl: r.map_url || r.mapUrl || null,
+              coords: r.coords || []
+            };
+          });
           setRestaurants(clientData);
         }
       } catch (err) {
@@ -158,7 +200,7 @@ function App() {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newRest, setNewRest] = useState({
     name: '', member: 'papa', region: '서울', category: 'korean',
-    rating: 5, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: ''
+    rating: 5, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: '', photo: null
   });
 
   // 맛집 수정 모달 제어 상태
@@ -472,6 +514,10 @@ function App() {
     if (!newRest.name.trim()) return alert('식당 이름을 적어주세요.');
 
     const cleanTags = newRest.tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
+    const dbTags = [...cleanTags];
+    if (newRest.photo) {
+      dbTags.push(`img:${newRest.photo}`);
+    }
 
     const dbObj = {
       id: Date.now(),
@@ -482,7 +528,7 @@ function App() {
       rating: parseFloat(newRest.rating),
       recom_menu: newRest.recomMenu.trim() || '전체 대표 메뉴',
       review: newRest.review.trim(),
-      tags: cleanTags.length > 0 ? cleanTags : ['추천맛집'],
+      tags: dbTags.length > 0 ? dbTags : ['추천맛집'],
       address: newRest.address.trim() || '주소 정보 없음',
       map_url: newRest.mapUrl.trim() || null,
       coords: [formLat, formLng]
@@ -501,7 +547,8 @@ function App() {
         rating: dbObj.rating,
         recomMenu: dbObj.recom_menu,
         review: dbObj.review,
-        tags: dbObj.tags,
+        tags: cleanTags,
+        photo: newRest.photo || null,
         address: dbObj.address,
         mapUrl: dbObj.map_url,
         coords: dbObj.coords
@@ -509,7 +556,7 @@ function App() {
 
       setRestaurants(prev => [clientObj, ...prev]);
       setIsAddingNew(false);
-      setNewRest({ name: '', member: 'papa', region: '서울', category: 'korean', rating: 5.0, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: '' });
+      setNewRest({ name: '', member: 'papa', region: '서울', category: 'korean', rating: 5.0, recomMenu: '', review: '', tagsInput: '', address: '', mapUrl: '', photo: null });
       setFormLat(37.5665);
       setFormLng(126.9780);
     } catch (err) {
@@ -532,6 +579,7 @@ function App() {
       tagsInput: rest.tags.join(', '),
       address: rest.address,
       mapUrl: rest.mapUrl || '',
+      photo: rest.photo || null,
       coords: rest.coords || [37.5665, 126.9780]
     });
     setFormLat(rest.coords?.[0] || 37.5665);
@@ -544,6 +592,10 @@ function App() {
     if (!editingRest.name.trim()) return alert('식당 이름을 적어주세요.');
 
     const cleanTags = editingRest.tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
+    const dbTags = [...cleanTags];
+    if (editingRest.photo) {
+      dbTags.push(`img:${editingRest.photo}`);
+    }
 
     const dbObj = {
       name: editingRest.name.trim(),
@@ -553,7 +605,7 @@ function App() {
       rating: parseFloat(editingRest.rating),
       recom_menu: editingRest.recomMenu.trim() || '전체 대표 메뉴',
       review: editingRest.review.trim(),
-      tags: cleanTags.length > 0 ? cleanTags : ['추천맛집'],
+      tags: dbTags.length > 0 ? dbTags : ['추천맛집'],
       address: editingRest.address.trim() || '주소 정보 없음',
       map_url: editingRest.mapUrl.trim() || null,
       coords: [formLat, formLng]
@@ -576,7 +628,8 @@ function App() {
         rating: dbObj.rating,
         recomMenu: dbObj.recom_menu,
         review: dbObj.review,
-        tags: dbObj.tags,
+        tags: cleanTags,
+        photo: editingRest.photo || null,
         address: dbObj.address,
         mapUrl: dbObj.map_url,
         coords: dbObj.coords
@@ -769,7 +822,12 @@ function App() {
                 const categoryEmoji = foodCategories.find(c => c.id === rest.category)?.name.split(' ').pop() || '🍚';
                 return (
                   <div key={rest.id} className="bistro-card" onClick={() => setSelectedRestaurant(rest)}>
-                    <div className="card-header">
+                    {rest.photo && (
+                      <div className="card-cover-image">
+                        <img src={rest.photo} alt={rest.name} />
+                      </div>
+                    )}
+                    <div className="card-header" style={{ borderTopLeftRadius: rest.photo ? '0' : '12px', borderTopRightRadius: rest.photo ? '0' : '12px' }}>
                       <span className="region-tag">{rest.region}</span>
                       <span className="category-emoji">{categoryEmoji}</span>
                     </div>
@@ -896,18 +954,39 @@ function App() {
               </div>
               <div className="detail-row">
                 <span className="detail-label">📍 식당 도로명 주소 (클릭 시 카카오맵 이동)</span>
-                <p className="detailed-address">
-                  {selectedRestaurant.mapUrl && selectedRestaurant.mapUrl.includes('kakao.com') ? (
-                    <a href={selectedRestaurant.mapUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)', textDecoration: 'underline', fontWeight: 600 }}>
-                      {selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'} ↗
-                    </a>
-                  ) : (
-                    <a href={`https://map.kakao.com/?q=${encodeURIComponent(selectedRestaurant.address || selectedRestaurant.name)}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)', textDecoration: 'underline', fontWeight: 600 }}>
-                      {selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'} ↗
-                    </a>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                  <p className="detailed-address" style={{ margin: 0, flex: 1 }}>
+                    {selectedRestaurant.mapUrl && selectedRestaurant.mapUrl.includes('kakao.com') ? (
+                      <a href={selectedRestaurant.mapUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)', textDecoration: 'underline', fontWeight: 600 }}>
+                        {selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'} ↗
+                      </a>
+                    ) : (
+                      <a href={`https://map.kakao.com/?q=${encodeURIComponent(selectedRestaurant.address || selectedRestaurant.name)}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)', textDecoration: 'underline', fontWeight: 600 }}>
+                        {selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'} ↗
+                      </a>
+                    )}
+                  </p>
+                  {selectedRestaurant.address && (
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(selectedRestaurant.address);
+                        alert('도로명 주소가 클립보드에 복사되었습니다!');
+                      }}
+                      className="copy-addr-btn"
+                    >
+                      📋 복사
+                    </button>
                   )}
-                </p>
+                </div>
               </div>
+              {selectedRestaurant.photo && (
+                <div className="detail-row">
+                  <span className="detail-label">📷 현장 검증 사진</span>
+                  <div className="detail-photo-container">
+                    <img src={selectedRestaurant.photo} alt="현장 사진" className="detail-photo-img" />
+                  </div>
+                </div>
+              )}
               <div className="detail-row">
                 <span className="detail-label">🍲 추천 대표 메뉴</span>
                 <p className="highlight-menu">{selectedRestaurant.recomMenu}</p>
@@ -1121,7 +1200,40 @@ function App() {
 
               <div className="form-group">
                 <label>비고</label>
-                <input type="text" placeholder="예: 주차편리, 웨이팅숨참, 노포맛집, 오션뷰" value={newRest.tagsInput} onChange={(e) => setNewRest({ ...newRest, tagsInput: e.target.value })} />
+                <input type="text" placeholder="예: 주차편리, 웨이팅숨참, 오션뷰" value={newRest.tagsInput} onChange={(e) => setNewRest({ ...newRest, tagsInput: e.target.value })} />
+              </div>
+
+              <div className="form-group">
+                <label>📷 현장 사진 첨부</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        const resizedBase64 = await resizeImage(file);
+                        setNewRest(prev => ({ ...prev, photo: resizedBase64 }));
+                      } catch (err) {
+                        console.error('이미지 리사이징 오류:', err);
+                        alert('이미지 처리 중 오류가 발생했습니다.');
+                      }
+                    }} 
+                  />
+                  {newRest.photo && (
+                    <div className="photo-upload-preview">
+                      <img src={newRest.photo} alt="미리보기" />
+                      <button 
+                        type="button" 
+                        className="photo-preview-delete" 
+                        onClick={() => setNewRest(prev => ({ ...prev, photo: null }))}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="form-actions">
@@ -1277,7 +1389,40 @@ function App() {
 
               <div className="form-group">
                 <label>비고</label>
-                <input type="text" placeholder="예: 주차편리, 웨이팅숨참, 노포맛집, 오션뷰" value={editingRest.tagsInput} onChange={(e) => setEditingRest({ ...editingRest, tagsInput: e.target.value })} />
+                <input type="text" placeholder="예: 주차편리, 웨이팅숨참, 오션뷰" value={editingRest.tagsInput} onChange={(e) => setEditingRest({ ...editingRest, tagsInput: e.target.value })} />
+              </div>
+
+              <div className="form-group">
+                <label>📷 현장 사진 첨부</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        const resizedBase64 = await resizeImage(file);
+                        setEditingRest(prev => ({ ...prev, photo: resizedBase64 }));
+                      } catch (err) {
+                        console.error('이미지 리사이징 오류:', err);
+                        alert('이미지 처리 중 오류가 발생했습니다.');
+                      }
+                    }} 
+                  />
+                  {editingRest.photo && (
+                    <div className="photo-upload-preview">
+                      <img src={editingRest.photo} alt="미리보기" />
+                      <button 
+                        type="button" 
+                        className="photo-preview-delete" 
+                        onClick={() => setEditingRest(prev => ({ ...prev, photo: null }))}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="form-actions">

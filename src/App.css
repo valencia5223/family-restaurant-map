@@ -1628,3 +1628,93 @@ body {
     border-radius: 6px;
   }
 }
+
+/* 📋 도로명 주소 우측 복사 버튼 스타일 */
+.copy-addr-btn {
+  background-color: #f7f1ee;
+  color: #4a3f3b;
+  border: 1.5px solid #d4c5c0;
+  border-radius: 6px;
+  font-family: var(--font-base);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.copy-addr-btn:hover {
+  background-color: var(--color-brand);
+  color: white;
+  border-color: var(--color-brand);
+}
+
+/* 🖼️ 카드 썸네일 커버 이미지 스타일 */
+.card-cover-image {
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom: 1.5px solid #ece4e1;
+}
+
+.card-cover-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.bistro-card:hover .card-cover-image img {
+  transform: scale(1.05);
+}
+
+/* 📷 상세 모달 내 실사 사진 컨테이너 스타일 */
+.detail-photo-container {
+  width: 100%;
+  margin-top: 6px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(44, 38, 35, 0.15);
+  border: 1.5px solid #e2d7d3;
+}
+
+.detail-photo-img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+/* 폼 업로드 썸네일 미리보기 피드백 */
+.photo-upload-preview {
+  position: relative;
+  display: inline-block;
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #d4c5c0;
+}
+
+.photo-upload-preview img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-preview-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: rgba(224, 92, 54, 0.9);
+  color: white;
+  border: none;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
