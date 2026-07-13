@@ -5,11 +5,12 @@ import './App.css';
 
 // 넷플릭스 스타일 프로필을 위한 매핑 정보
 const memberProfiles = {
-  papa: { name: '아빠', emoji: '👨‍💼' },
-  mama: { name: '엄마', emoji: '👩‍🍳' },
-  daughter: { name: '큰딸 랑구', emoji: '🙋‍♀️' },
-  makdung: { name: '작은딸 막둥이', emoji: '👧' },
-  husband: { name: '사위 차서방', emoji: '🙋‍♂️' }
+  papa: { name: '아빠', avatar: '/avatars/avatar_papa.png' },
+  mama: { name: '엄마', avatar: '/avatars/avatar_mama.png' },
+  daughter: { name: '큰딸 랑구', avatar: '/avatars/avatar_daughter.png' },
+  makdung: { name: '작은딸 막둥이', avatar: '/avatars/avatar_makdung.png' },
+  husband: { name: '사위 차서방', avatar: '/avatars/avatar_husband.png' },
+  yuna: { name: '차유나(손주)', avatar: '/avatars/avatar_yuna.png' }
 };
 
 // ──────────────────────────────────────────────────
@@ -184,7 +185,7 @@ function App() {
   // 2. 대시보드 통계 계산
   // ──────────────────────────────────────────────────
   const stats = useMemo(() => {
-    if (restaurants.length === 0) return { total: 0, topMember: '-', topFood: '-', avgRating: '0.0' };
+    if (restaurants.length === 0) return { total: 0, topMemberInfo: null, topFood: '-', avgRating: '0.0' };
     const memberCounts = {};
     restaurants.forEach(r => { memberCounts[r.member] = (memberCounts[r.member] || 0) + 1; });
     let topMemKey = '-', maxMemCount = 0;
@@ -194,9 +195,9 @@ function App() {
     let topCatKey = '-', maxCatCount = 0;
     Object.entries(catCounts).forEach(([k, v]) => { if (v > maxCatCount) { maxCatCount = v; topCatKey = k; } });
     const avgRating = (restaurants.reduce((s, r) => s + r.rating, 0) / restaurants.length).toFixed(1);
-    const memberName = members[topMemKey] ? `${members[topMemKey].avatar} ${members[topMemKey].name}` : '-';
+    const topMemberInfo = members[topMemKey] || null;
     const catName = foodCategories.find(c => c.id === topCatKey)?.name || '-';
-    return { total: restaurants.length, topMember: memberName, topFood: catName, avgRating };
+    return { total: restaurants.length, topMemberInfo, topFood: catName, avgRating };
   }, [restaurants]);
 
   // ──────────────────────────────────────────────────
@@ -366,7 +367,10 @@ function App() {
       const infoContent = `
         <div style="padding:14px 16px;min-width:200px;font-family:'Pretendard',sans-serif;border-radius:12px;">
           <strong style="font-size:15px;">${rest.name}</strong>
-          <p style="margin:4px 0;font-size:12px;color:#888;">${memInfo.avatar} ${memInfo.name} 추천 &nbsp;⭐ ${rest.rating}/5</p>
+          <p style="margin:4px 0;font-size:12px;color:#888;display:flex;align-items:center;gap:4px;">
+            <img src="${memInfo.avatar}" style="width:16px;height:16px;border-radius:50%;object-fit:cover;" />
+            ${memInfo.name} 추천 &nbsp;⭐ ${rest.rating}/5
+          </p>
           <p style="margin:4px 0;font-size:12px;color:#555;">${rest.address || '주소 미기입'}</p>
           <div style="margin-top:8px;display:flex;gap:6px;">
             ${rest.mapUrl ? `<a href="${rest.mapUrl}" target="_blank" style="font-size:11px;background:#FEE500;color:#3C1E1E;padding:4px 10px;border-radius:20px;text-decoration:none;font-weight:600;">카카오맵 열기 ↗</a>` : ''}
@@ -601,7 +605,7 @@ function App() {
                 onClick={() => handleProfileChange(key)}
               >
                 <div className="profile-avatar-wrapper">
-                  {prof.emoji}
+                  <img src={prof.avatar} className="profile-avatar-img" alt={prof.name} />
                 </div>
                 <div className="profile-name">{prof.name}</div>
               </div>
@@ -617,7 +621,9 @@ function App() {
       {/* 🎭 상단 헤더 프로필 퀵 스위처 */}
       <div className="header-profile-section">
         <div className="header-profile-badge">
-          <span className="header-profile-emoji">{memberProfiles[activeProfile]?.emoji}</span>
+          <span className="header-profile-emoji">
+            <img src={memberProfiles[activeProfile]?.avatar} alt="" />
+          </span>
           <span>{memberProfiles[activeProfile]?.name}</span>
           <button className="header-profile-btn" onClick={() => handleProfileChange(null)}>
             전환
@@ -638,7 +644,17 @@ function App() {
       {/* 대시보드 */}
       <section className="stats-dashboard">
         <div className="stat-card"><span className="stat-num">{stats.total}개</span><span className="stat-label">보관 맛집 수</span></div>
-        <div className="stat-card"><span className="stat-num">{stats.topMember}</span><span className="stat-label">최다 맛집 헌터</span></div>
+        <div className="stat-card">
+          <span className="stat-num" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            {stats.topMemberInfo ? (
+              <>
+                <img src={stats.topMemberInfo.avatar} className="avatar-mini-inline" alt="" />
+                <span>{stats.topMemberInfo.name}</span>
+              </>
+            ) : '-'}
+          </span>
+          <span className="stat-label">최다 맛집 헌터</span>
+        </div>
         <div className="stat-card"><span className="stat-num">{stats.topFood}</span><span className="stat-label">가족 선호 음식 1위</span></div>
         <div className="stat-card"><span className="stat-num">⭐ {stats.avgRating}</span><span className="stat-label">가족 평균 리뷰 별점</span></div>
       </section>
@@ -693,7 +709,7 @@ function App() {
         <div className="avatar-row">
           {Object.entries(members).map(([key, mem]) => (
             <button key={key} className={`avatar-button ${selectedMember === key ? 'active' : ''}`} onClick={() => setSelectedMember(key)}>
-              <span className="avatar-icon">{mem.avatar}</span>
+              <span className="avatar-icon"><img src={mem.avatar} alt="" /></span>
               <span className="avatar-name">{mem.name}</span>
               <span className="avatar-role">{mem.role}</span>
             </button>
@@ -723,7 +739,7 @@ function App() {
                     </div>
                     <h3 className="restaurant-title">{rest.name}</h3>
                     <div className="recommender-badge">
-                      <span className="avatar-mini">{memInfo.avatar}</span>
+                      <span className="avatar-mini"><img src={memInfo.avatar} alt="" /></span>
                       <span>{memInfo.name} 추천</span>
                     </div>
                     <hr className="card-divider" />
@@ -830,7 +846,10 @@ function App() {
               <h2>{selectedRestaurant.name}</h2>
               <div className="modal-recommender">
                 <span>추천 헌터:</span>
-                <strong>{members[selectedRestaurant.member]?.avatar} {members[selectedRestaurant.member]?.name} ({members[selectedRestaurant.member]?.role})</strong>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <img src={members[selectedRestaurant.member]?.avatar} className="avatar-mini-inline" alt="" />
+                  <strong>{members[selectedRestaurant.member]?.name} ({members[selectedRestaurant.member]?.role})</strong>
+                </span>
               </div>
             </div>
             <hr className="divider" />
@@ -843,12 +862,51 @@ function App() {
                 <span className="detail-label">📍 식당 도로명 주소</span>
                 <p className="detailed-address">{selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'}</p>
               </div>
-              {selectedRestaurant.mapUrl && (
-                <div className="detail-row">
-                  <span className="detail-label">🗺️ 카카오맵 바로가기</span>
-                  <a href={selectedRestaurant.mapUrl} target="_blank" rel="noopener noreferrer" className="modal-external-map-btn">🗺️ 카카오맵에서 링크 열기 ↗</a>
+              <div className="detail-row">
+                <span className="detail-label">🚗 내비게이션 길안내 바로가기</span>
+                <div className="navigation-buttons-container">
+                  <a 
+                    href={(() => {
+                      const lat = selectedRestaurant.coords?.[0];
+                      const lng = selectedRestaurant.coords?.[1];
+                      return lat && lng
+                        ? `https://map.kakao.com/link/to/${encodeURIComponent(selectedRestaurant.name)},${lat},${lng}`
+                        : (selectedRestaurant.mapUrl || `https://map.kakao.com/?q=${encodeURIComponent(selectedRestaurant.name)}`);
+                    })()} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="nav-btn kakao-nav-btn"
+                  >
+                    💛 카카오맵 길안내
+                  </a>
+                  <a 
+                    href={(() => {
+                      const lat = selectedRestaurant.coords?.[0];
+                      const lng = selectedRestaurant.coords?.[1];
+                      return lat && lng
+                        ? `https://map.naver.com/v5/directions/-,-,${encodeURIComponent(selectedRestaurant.name)},${lng},${lat},-/mode/route`
+                        : `https://map.naver.com/v5/search/${encodeURIComponent(selectedRestaurant.address || selectedRestaurant.name)}`;
+                    })()} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="nav-btn naver-nav-btn"
+                  >
+                    💚 네이버 지도 길안내
+                  </a>
+                  <a 
+                    href={(() => {
+                      const lat = selectedRestaurant.coords?.[0];
+                      const lng = selectedRestaurant.coords?.[1];
+                      return lat && lng
+                        ? `tmap://route?rGoName=${encodeURIComponent(selectedRestaurant.name)}&rGoX=${lng}&rGoY=${lat}`
+                        : `tmap://search?name=${encodeURIComponent(selectedRestaurant.name)}`;
+                    })()} 
+                    className="nav-btn tmap-nav-btn"
+                  >
+                    ❤️ 티맵(Tmap) 길안내
+                  </a>
                 </div>
-              )}
+              </div>
               <div className="detail-row">
                 <span className="detail-label">🍲 추천 대표 메뉴</span>
                 <p className="highlight-menu">{selectedRestaurant.recomMenu}</p>
@@ -921,11 +979,12 @@ function App() {
                 <div className="form-group">
                   <label>추천 작성자</label>
                   <select value={newRest.member} onChange={(e) => setNewRest({ ...newRest, member: e.target.value })}>
-                    <option value="papa">아빠 👨‍💼</option>
-                    <option value="mama">엄마 👩‍🍳</option>
-                    <option value="daughter">큰딸 🙋‍♀️</option>
-                    <option value="makdung">작은딸 👧</option>
-                    <option value="husband">사위 🙋‍♂️</option>
+                    <option value="papa">아빠</option>
+                    <option value="mama">엄마</option>
+                    <option value="daughter">큰딸</option>
+                    <option value="makdung">작은딸</option>
+                    <option value="husband">사위</option>
+                    <option value="yuna">차유나(손주)</option>
                   </select>
                 </div>
               </div>
@@ -1076,11 +1135,12 @@ function App() {
                 <div className="form-group">
                   <label>추천 작성자</label>
                   <select value={editingRest.member} onChange={(e) => setEditingRest({ ...editingRest, member: e.target.value })}>
-                    <option value="papa">아빠 👨‍💼</option>
-                    <option value="mama">엄마 👩‍🍳</option>
-                    <option value="daughter">큰딸 🙋‍♀️</option>
-                    <option value="makdung">작은딸 👧</option>
-                    <option value="husband">사위 🙋‍♂️</option>
+                    <option value="papa">아빠</option>
+                    <option value="mama">엄마</option>
+                    <option value="daughter">큰딸</option>
+                    <option value="makdung">작은딸</option>
+                    <option value="husband">사위</option>
+                    <option value="yuna">차유나(손주)</option>
                   </select>
                 </div>
               </div>

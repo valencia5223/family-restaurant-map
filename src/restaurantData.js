@@ -1,10 +1,11 @@
 export const members = {
-  all: { avatar: '👪', name: '가족 전체', role: '우리 가족' },
-  papa: { avatar: '👨‍💼', name: '아빠', role: '부모님' },
-  mama: { avatar: '👩‍🍳', name: '엄마', role: '부모님' },
-  daughter: { avatar: '🙋‍♀️', name: '큰딸', role: '랑구' },
-  makdung: { avatar: '👧', name: '작은딸', role: '막둥이' },
-  husband: { avatar: '🙋‍♂️', name: '사위', role: '차서방' }
+  all: { avatar: '/avatars/avatar_all.png', name: '가족 전체', role: '우리 가족' },
+  papa: { avatar: '/avatars/avatar_papa.png', name: '아빠', role: '부모님' },
+  mama: { avatar: '/avatars/avatar_mama.png', name: '엄마', role: '부모님' },
+  daughter: { avatar: '/avatars/avatar_daughter.png', name: '큰딸', role: '랑구' },
+  makdung: { avatar: '/avatars/avatar_makdung.png', name: '작은딸', role: '막둥이' },
+  husband: { avatar: '/avatars/avatar_husband.png', name: '사위', role: '차서방' },
+  yuna: { avatar: '/avatars/avatar_yuna.png', name: '차유나', role: '손주' }
 };
 
 export const regions = [
