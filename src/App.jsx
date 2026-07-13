@@ -5,11 +5,11 @@ import './App.css';
 
 // 넷플릭스 스타일 프로필을 위한 매핑 정보
 const memberProfiles = {
-  papa: { name: '아빠', avatar: '/avatars/avatar_papa.png' },
-  mama: { name: '엄마', avatar: '/avatars/avatar_mama.png' },
-  daughter: { name: '큰딸 랑구', avatar: '/avatars/avatar_daughter.png' },
-  makdung: { name: '작은딸 막둥이', avatar: '/avatars/avatar_makdung.png' },
-  husband: { name: '사위 차서방', avatar: '/avatars/avatar_husband.png' },
+  papa: { name: '할비', avatar: '/avatars/avatar_papa.png' },
+  mama: { name: '할미', avatar: '/avatars/avatar_mama.png' },
+  daughter: { name: '엄마', avatar: '/avatars/avatar_daughter.png' },
+  makdung: { name: '이모', avatar: '/avatars/avatar_makdung.png' },
+  husband: { name: '아빠', avatar: '/avatars/avatar_husband.png' },
   yuna: { name: '차유나(손주)', avatar: '/avatars/avatar_yuna.png' }
 };
 
@@ -46,14 +46,28 @@ function mapKakaoCategory(categoryGroupCode, categoryName) {
 }
 
 // ──────────────────────────────────────────────────
-// 별점 렌더링 헬퍼 (0.5 단위 지원)
+// 별점 렌더링 헬퍼 (0.5 단위 지원, 모바일 깨짐 방지용 CSS 마스크 방식 적용)
 // ──────────────────────────────────────────────────
 function renderStars(ratingStr) {
   const rating = parseFloat(ratingStr) || 0;
-  const fullStars = Math.floor(rating);
-  const hasHalf = rating % 1 >= 0.5;
-  const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
-  return '★'.repeat(fullStars) + (hasHalf ? '⯪' : '') + '☆'.repeat(emptyStars);
+  const starsArray = [];
+  const fullColor = '#ffac00';
+  const emptyColor = '#d4c5c0';
+  for (let i = 1; i <= 5; i++) {
+    if (rating >= i) {
+      starsArray.push(<span key={i} style={{ color: fullColor }}>★</span>);
+    } else if (rating >= i - 0.5) {
+      starsArray.push(
+        <span key={i} style={{ position: 'relative', display: 'inline-block', color: emptyColor, lineHeight: '1' }}>
+          <span style={{ position: 'absolute', top: 0, left: 0, overflow: 'hidden', width: '50%', color: fullColor }}>★</span>
+          ★
+        </span>
+      );
+    } else {
+      starsArray.push(<span key={i} style={{ color: emptyColor }}>☆</span>);
+    }
+  }
+  return starsArray;
 }
 
 // 🖼️ 모바일 브라우저 친화형 이미지 리사이저 및 압축기 (동일 스펙 맞춤형 용량 감소화)
@@ -809,15 +823,15 @@ function App() {
             <select value={selectedRating} onChange={(e) => setSelectedRating(e.target.value)}>
               <option value="all">모든 별점 ⭐</option>
               <option value="5.0">⭐⭐⭐⭐⭐ (5.0점 전용)</option>
-              <option value="4.5">⭐⭐⭐⭐⯪ (4.5점 이상)</option>
+              <option value="4.5">⭐⭐⭐⭐½ (4.5점 이상)</option>
               <option value="4.0">⭐⭐⭐⭐ (4.0점 이상)</option>
-              <option value="3.5">⭐⭐⭐⯪ (3.5점 이상)</option>
+              <option value="3.5">⭐⭐⭐½ (3.5점 이상)</option>
               <option value="3.0">⭐⭐⭐ (3.0점 이상)</option>
-              <option value="2.5">⭐⭐⯪ (2.5점 이상)</option>
+              <option value="2.5">⭐⭐½ (2.5점 이상)</option>
               <option value="2.0">⭐⭐ (2.0점 이상)</option>
-              <option value="1.5">⭐⯪ (1.5점 이상)</option>
+              <option value="1.5">⭐½ (1.5점 이상)</option>
               <option value="1.0">⭐ (1.0점 이상)</option>
-              <option value="0.5">⯪ (0.5점 이상)</option>
+              <option value="0.5">½ (0.5점 이상)</option>
             </select>
           </div>
         </div>
@@ -1266,15 +1280,15 @@ function App() {
                   <label>내 추천 별점</label>
                   <select value={newRest.rating} onChange={(e) => setNewRest({ ...newRest, rating: parseFloat(e.target.value) })}>
                     <option value={5.0}>⭐⭐⭐⭐⭐ (5.0 / 강력 추천)</option>
-                    <option value={4.5}>⭐⭐⭐⭐⯪ (4.5 / 추천)</option>
+                    <option value={4.5}>⭐⭐⭐⭐½ (4.5 / 추천)</option>
                     <option value={4.0}>⭐⭐⭐⭐ (4.0 / 추천)</option>
-                    <option value={3.5}>⭐⭐⭐⯪ (3.5 / 무난함)</option>
+                    <option value={3.5}>⭐⭐⭐½ (3.5 / 무난함)</option>
                     <option value={3.0}>⭐⭐⭐ (3.0 / 평범함)</option>
-                    <option value={2.5}>⭐⭐⯪ (2.5 / 아쉬움)</option>
+                    <option value={2.5}>⭐⭐½ (2.5 / 아쉬움)</option>
                     <option value={2.0}>⭐⭐ (2.0 / 아쉬움)</option>
-                    <option value={1.5}>⭐⯪ (1.5 / 비추)</option>
+                    <option value={1.5}>⭐½ (1.5 / 비추)</option>
                     <option value={1.0}>⭐ (1.0 / 비추)</option>
-                    <option value={0.5}>⯪ (0.5 / 강력 비추)</option>
+                    <option value={0.5}>½ (0.5 / 강력 비추)</option>
                   </select>
                 </div>
               </div>
@@ -1455,15 +1469,15 @@ function App() {
                   <label>내 추천 별점</label>
                   <select value={editingRest.rating} onChange={(e) => setEditingRest({ ...editingRest, rating: parseFloat(e.target.value) })}>
                     <option value={5.0}>⭐⭐⭐⭐⭐ (5.0 / 강력 추천)</option>
-                    <option value={4.5}>⭐⭐⭐⭐⯪ (4.5 / 추천)</option>
+                    <option value={4.5}>⭐⭐⭐⭐½ (4.5 / 추천)</option>
                     <option value={4.0}>⭐⭐⭐⭐ (4.0 / 추천)</option>
-                    <option value={3.5}>⭐⭐⭐⯪ (3.5 / 무난함)</option>
+                    <option value={3.5}>⭐⭐⭐½ (3.5 / 무난함)</option>
                     <option value={3.0}>⭐⭐⭐ (3.0 / 평범함)</option>
-                    <option value={2.5}>⭐⭐⯪ (2.5 / 아쉬움)</option>
+                    <option value={2.5}>⭐⭐½ (2.5 / 아쉬움)</option>
                     <option value={2.0}>⭐⭐ (2.0 / 아쉬움)</option>
-                    <option value={1.5}>⭐⯪ (1.5 / 비추)</option>
+                    <option value={1.5}>⭐½ (1.5 / 비추)</option>
                     <option value={1.0}>⭐ (1.0 / 비추)</option>
-                    <option value={0.5}>⯪ (0.5 / 강력 비추)</option>
+                    <option value={0.5}>½ (0.5 / 강력 비추)</option>
                   </select>
                 </div>
               </div>
