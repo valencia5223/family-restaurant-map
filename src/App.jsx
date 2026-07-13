@@ -863,6 +863,18 @@ function App() {
                 <p className="detailed-address">{selectedRestaurant.address || '주소 정보가 기입되지 않았습니다.'}</p>
               </div>
               <div className="detail-row">
+                <span className="detail-label">🔗 Kakao Map 매장 정보 바로가기</span>
+                {selectedRestaurant.mapUrl ? (
+                  <a href={selectedRestaurant.mapUrl} target="_blank" rel="noopener noreferrer" className="modal-external-map-btn">
+                    🖥️ 카카오맵 상세 정보 및 리뷰 보기 ↗
+                  </a>
+                ) : (
+                  <a href={`https://map.kakao.com/?q=${encodeURIComponent(selectedRestaurant.name)}`} target="_blank" rel="noopener noreferrer" className="modal-external-map-btn">
+                    🔍 카카오맵에서 상점 정보 검색 ↗
+                  </a>
+                )}
+              </div>
+              <div className="detail-row">
                 <span className="detail-label">🚗 내비게이션 길안내 바로가기</span>
                 <div className="navigation-buttons-container">
                   <a 
