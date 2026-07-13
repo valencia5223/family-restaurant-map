@@ -70,6 +70,64 @@ function renderStars(ratingStr) {
   return starsArray;
 }
 
+// 🎨 리액트 기반 커스텀 별점 셀렉트 컴포넌트 (모바일 뷰어용 깨짐 없는 반별 출력)
+// ──────────────────────────────────────────────────
+function RatingSelect({ value, onChange, options }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOpt = options.find(opt => String(opt.value) === String(value)) || options[0];
+
+  return (
+    <div className="custom-select-container" ref={containerRef}>
+      <div 
+        className={`custom-select-trigger ${isOpen ? 'open-trigger' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+        tabIndex="0"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
+      >
+        <span className="custom-select-trigger-label">
+          {selectedOpt ? selectedOpt.label : '선택'}
+        </span>
+        <span className={`custom-select-arrow ${isOpen ? 'rotated' : ''}`}>▼</span>
+      </div>
+      {isOpen && (
+        <div className="custom-select-options">
+          {options.map((opt) => (
+            <div
+              key={opt.value}
+              className={`custom-select-option ${String(value) === String(opt.value) ? 'selected-opt' : ''}`}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
 // 🖼️ 모바일 브라우저 친화형 이미지 리사이저 및 압축기 (동일 스펙 맞춤형 용량 감소화)
 const resizeImage = (file) => {
   return new Promise((resolve, reject) => {
@@ -820,19 +878,23 @@ function App() {
           </div>
           <div className="filter-group">
             <label>별점 선택</label>
-            <select value={selectedRating} onChange={(e) => setSelectedRating(e.target.value)}>
-              <option value="all">모든 별점 ⭐</option>
-              <option value="5.0">⭐⭐⭐⭐⭐ (5.0점 전용)</option>
-              <option value="4.5">⭐⭐⭐⭐½ (4.5점 이상)</option>
-              <option value="4.0">⭐⭐⭐⭐ (4.0점 이상)</option>
-              <option value="3.5">⭐⭐⭐½ (3.5점 이상)</option>
-              <option value="3.0">⭐⭐⭐ (3.0점 이상)</option>
-              <option value="2.5">⭐⭐½ (2.5점 이상)</option>
-              <option value="2.0">⭐⭐ (2.0점 이상)</option>
-              <option value="1.5">⭐½ (1.5점 이상)</option>
-              <option value="1.0">⭐ (1.0점 이상)</option>
-              <option value="0.5">½ (0.5점 이상)</option>
-            </select>
+            <RatingSelect
+              value={selectedRating}
+              onChange={setSelectedRating}
+              options={[
+                { value: 'all', label: <>모든 별점 ⭐</> },
+                { value: '5.0', label: <>{renderStars(5.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(5.0점 전용)</span></> },
+                { value: '4.5', label: <>{renderStars(4.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.5점 이상)</span></> },
+                { value: '4.0', label: <>{renderStars(4.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.0점 이상)</span></> },
+                { value: '3.5', label: <>{renderStars(3.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.5점 이상)</span></> },
+                { value: '3.0', label: <>{renderStars(3.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.0점 이상)</span></> },
+                { value: '2.5', label: <>{renderStars(2.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.5점 이상)</span></> },
+                { value: '2.0', label: <>{renderStars(2.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.0점 이상)</span></> },
+                { value: '1.5', label: <>{renderStars(1.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.5점 이상)</span></> },
+                { value: '1.0', label: <>{renderStars(1.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.0점 이상)</span></> },
+                { value: '0.5', label: <>{renderStars(0.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(0.5점 이상)</span></> }
+              ]}
+            />
           </div>
         </div>
       </section>
@@ -1278,18 +1340,22 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label>내 추천 별점</label>
-                  <select value={newRest.rating} onChange={(e) => setNewRest({ ...newRest, rating: parseFloat(e.target.value) })}>
-                    <option value={5.0}>⭐⭐⭐⭐⭐ (5.0 / 강력 추천)</option>
-                    <option value={4.5}>⭐⭐⭐⭐½ (4.5 / 추천)</option>
-                    <option value={4.0}>⭐⭐⭐⭐ (4.0 / 추천)</option>
-                    <option value={3.5}>⭐⭐⭐½ (3.5 / 무난함)</option>
-                    <option value={3.0}>⭐⭐⭐ (3.0 / 평범함)</option>
-                    <option value={2.5}>⭐⭐½ (2.5 / 아쉬움)</option>
-                    <option value={2.0}>⭐⭐ (2.0 / 아쉬움)</option>
-                    <option value={1.5}>⭐½ (1.5 / 비추)</option>
-                    <option value={1.0}>⭐ (1.0 / 비추)</option>
-                    <option value={0.5}>½ (0.5 / 강력 비추)</option>
-                  </select>
+                  <RatingSelect
+                    value={newRest.rating}
+                    onChange={(val) => setNewRest({ ...newRest, rating: parseFloat(val) })}
+                    options={[
+                      { value: 5.0, label: <>{renderStars(5.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(5.0 / 강력 추천)</span></> },
+                      { value: 4.5, label: <>{renderStars(4.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.5 / 추천)</span></> },
+                      { value: 4.0, label: <>{renderStars(4.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.0 / 추천)</span></> },
+                      { value: 3.5, label: <>{renderStars(3.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.5 / 무난함)</span></> },
+                      { value: 3.0, label: <>{renderStars(3.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.0 / 평범함)</span></> },
+                      { value: 2.5, label: <>{renderStars(2.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.5 / 아쉬움)</span></> },
+                      { value: 2.0, label: <>{renderStars(2.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.0 / 아쉬움)</span></> },
+                      { value: 1.5, label: <>{renderStars(1.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.5 / 비추)</span></> },
+                      { value: 1.0, label: <>{renderStars(1.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.0 / 비추)</span></> },
+                      { value: 0.5, label: <>{renderStars(0.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(0.5 / 강력 비추)</span></> }
+                    ]}
+                  />
                 </div>
               </div>
 
@@ -1467,18 +1533,22 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label>내 추천 별점</label>
-                  <select value={editingRest.rating} onChange={(e) => setEditingRest({ ...editingRest, rating: parseFloat(e.target.value) })}>
-                    <option value={5.0}>⭐⭐⭐⭐⭐ (5.0 / 강력 추천)</option>
-                    <option value={4.5}>⭐⭐⭐⭐½ (4.5 / 추천)</option>
-                    <option value={4.0}>⭐⭐⭐⭐ (4.0 / 추천)</option>
-                    <option value={3.5}>⭐⭐⭐½ (3.5 / 무난함)</option>
-                    <option value={3.0}>⭐⭐⭐ (3.0 / 평범함)</option>
-                    <option value={2.5}>⭐⭐½ (2.5 / 아쉬움)</option>
-                    <option value={2.0}>⭐⭐ (2.0 / 아쉬움)</option>
-                    <option value={1.5}>⭐½ (1.5 / 비추)</option>
-                    <option value={1.0}>⭐ (1.0 / 비추)</option>
-                    <option value={0.5}>½ (0.5 / 강력 비추)</option>
-                  </select>
+                  <RatingSelect
+                    value={editingRest.rating}
+                    onChange={(val) => setEditingRest({ ...editingRest, rating: parseFloat(val) })}
+                    options={[
+                      { value: 5.0, label: <>{renderStars(5.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(5.0 / 강력 추천)</span></> },
+                      { value: 4.5, label: <>{renderStars(4.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.5 / 추천)</span></> },
+                      { value: 4.0, label: <>{renderStars(4.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(4.0 / 추천)</span></> },
+                      { value: 3.5, label: <>{renderStars(3.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.5 / 무난함)</span></> },
+                      { value: 3.0, label: <>{renderStars(3.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(3.0 / 평범함)</span></> },
+                      { value: 2.5, label: <>{renderStars(2.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.5 / 아쉬움)</span></> },
+                      { value: 2.0, label: <>{renderStars(2.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(2.0 / 아쉬움)</span></> },
+                      { value: 1.5, label: <>{renderStars(1.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.5 / 비추)</span></> },
+                      { value: 1.0, label: <>{renderStars(1.0)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(1.0 / 비추)</span></> },
+                      { value: 0.5, label: <>{renderStars(0.5)} <span style={{ marginLeft: '4px', fontSize: '0.78rem', color: '#888' }}>(0.5 / 강력 비추)</span></> }
+                    ]}
+                  />
                 </div>
               </div>
 
